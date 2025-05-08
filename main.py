@@ -38,12 +38,22 @@ class Core:
                 words = words[max_words:]
         return frames
 
+    def _add_disclaimer(self, description):
+        if not self.preset.prompt:
+            return description
+        hashtag_pos = description.find("#")
+        if hashtag_pos != -1:
+            new_description = description[:hashtag_pos] + f"{DISCLAIMER}\n\n" + description[hashtag_pos:]
+        else:
+            new_description = description + DISCLAIMER
+        return new_description
+
     def _upload(self, captions, video_title, intro_message):
         if not video_title or not isinstance(video_title, str):
             raise ValueError("Invalid video title provided.")
 
-        description = self.preset.description or self.res_handler.gemini(captions, GET_DESCRIPTION)
-        tags = self.preset.tags or self.res_handler.gemini(f"{intro_message}: {captions}", GET_TAGS).split(",")
+        description = self._add_disclaimer(self.preset.description or self.res_handler.gemini(captions, GET_DESCRIPTION))
+        tags = [self.preset.tags or self.res_handler.gemini(f"{intro_message}: {description}", GET_TAGS).split(",")]
 
         cleaned_title = video_title.replace("#shorts", "").strip()
         video_path = getattr(self, "output_path", "output.mp4")
@@ -53,21 +63,21 @@ class Core:
                 video_path=video_path,
                 title=video_title,
                 description=description,
-                tags=tags,
+                tags=tags[:30],
                 categoryId=self.preset.category_id
             )
             if cleaned_title not in self.preset.used_content:
                 self.preset.add_to_used(cleaned_title)
         except Exception as e:
-            if self.preset.save:
-                self._save_video(video_title)
+            logging.info(video_title, description, tags)
             raise RuntimeError(f"[Upload Failed] {type(e).__name__}: {e}")
 
     def _save_video(self, video_title):
         safe_title = re.sub(r'[\\/*?:"<>|]', "_", video_title)
-        os.makedirs("saved_videos", exist_ok=True)
+        preset_folder = os.path.join("saved_videos", self.preset.name)
+        os.makedirs(preset_folder, exist_ok=True)
         source_path = "output.mp4"
-        destination = os.path.join("saved_videos", f"{safe_title}.mp4")
+        destination = os.path.join(preset_folder, f"{safe_title}.mp4")
 
         if not os.path.exists(source_path):
             raise FileNotFoundError(f"Cannot save video: '{source_path}' does not exist.")
@@ -83,12 +93,16 @@ class Core:
         return self.res_handler.gemini(prompt)
 
     def _get_captions(self):
+        pending = self.preset.get_pending()
+        if pending:
+            return pending
         if self.preset.script:
             return self.preset.script
         if self.preset.sheet_id:
             logging.info(f"Fetching from sheet: {self.preset.sheet_id}")
             sheet_text = self.res_handler.get_sheet_response(self.preset.sheet_id)
-            return self.res_handler.gemini(f"Correct punctuation and spelling:\n{sheet_text}")
+            if sheet_text:
+                return self.res_handler.gemini(f"Correct punctuation and spelling:\n{sheet_text}")
         if self.preset.prompt:
             logging.info(f"Generating content.")
             return self._get_content()
@@ -100,8 +114,8 @@ class Core:
         return self.res_handler.gemini(captions, GET_INTRO)
 
     def run(self):
+        captions = None
         try:
-            captions = None
             while self.preset:
                 captions = self._get_captions()
                 if not captions:
@@ -114,7 +128,7 @@ class Core:
 
                 for caption in captions_list:
                     self.speech_handler.add_text(caption)
-
+ 
                 timeline = self.speech_handler.speak(self.preset.voice)
                 end_time, ass_file = self.caption_handler.generate_ass(captions_list, timeline)
                 path = self.media_handler.process_media(self.preset.template, self.preset.audio)
@@ -125,15 +139,22 @@ class Core:
                 if self.preset.upload:
                     self._upload(captions, title, intro)
 
+                if self.preset.save:
+                    self._save_video(title)
+
                 if self.preset.script:
                     break
 
                 logging.info(f"Sleeping for {self.delay} seconds before the next run...")
                 time.sleep(self.delay)
+                captions = None
         except KeyboardInterrupt:
             logging.info("Shutting down...")
         except Exception as e:
             logging.exception(f"Unexpected Error: {e}")
+        finally:
+            if captions:
+                self.preset.add_to_pending(captions)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()

@@ -13,8 +13,10 @@ class ResponseHandler:
         try:
             sheet = self.client.open_by_key(sheet_id)
             values_list = sheet.sheet1.row_values(2)
-            sheet.sheet1.delete_rows(2)
-            return re.sub(r'\s+', ' ', values_list[1]).strip()
+            if values_list:
+                sheet.sheet1.delete_rows(2)
+                return re.sub(r'\s+', ' ', values_list[1]).strip()
+            return None
         except Exception as e:
             logging.error(f"Error fetching sheet data: {e}")
             raise
@@ -24,8 +26,8 @@ class ResponseHandler:
             "contents": [
                 {
                     "parts": [
-                        {"text": prompt},
-                        {"text": query}
+                        {"text": query},
+                        {"text": prompt}
                     ]
                 }
             ]
