@@ -21,7 +21,7 @@ class ResponseHandler:
             logging.error(f"Error fetching sheet data: {e}")
             raise
 
-    def get_payload(self, query, prompt):
+    def _get_payload(self, query, prompt):
         payload = {
             "contents": [
                 {
@@ -39,7 +39,7 @@ class ResponseHandler:
         endpoint = ENDPOINT_2
         while retries < max_retries:
             try:
-                response = self.session.post(endpoint, json=self.get_payload(query, prompt))
+                response = self.session.post(endpoint, json=self._get_payload(query, prompt))
                 response.raise_for_status()
                 response_text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
                 return data_type(response_text)

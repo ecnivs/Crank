@@ -9,7 +9,8 @@ class MediaHandler:
         self.duration = duration
         self.supported_exts = ['.mp4', '.mov', '.avi', '.mkv']
 
-    def process_media(self, path, audio_path=None):
+    def process_media(self, path, end_time, audio_path=None):
+        self.duration = end_time
         if not os.path.exists(path):
             raise FileNotFoundError(f"Path does not exist: {path}")
 
@@ -253,6 +254,3 @@ class MediaHandler:
             tempfile.gettempdir(),
             "processed_video.mp4"
         )
-
-a = MediaHandler()
-a.process_media("templates/asmr", "audio/piano.wav")

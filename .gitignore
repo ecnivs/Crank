@@ -8,3 +8,4 @@ presets/
 .env
 *.sh
 *.mp4
+*.png

@@ -88,6 +88,17 @@ class VideoEditor:
                 os.remove(output_path)
             raise RuntimeError(f"Failed to add card to video: {error_output}")
 
+    def _has_audio(self, video_path):
+        cmd = [
+            "ffprobe", "-v", "error",
+            "-select_streams", "a",
+            "-show_entries", "stream=codec_type",
+            "-of", "json", video_path
+        ]
+        output = subprocess.check_output(cmd)
+        info = json.loads(output)
+        return bool(info.get("streams"))
+
     def generate_video(self, end_time, input_video, card, ass_file):
         if not os.path.exists(input_video):
             raise FileNotFoundError(f"Input video not found: {input_video}")
@@ -95,7 +106,6 @@ class VideoEditor:
             raise FileNotFoundError(f"Card image not found: {card}")
         if not os.path.exists(ass_file):
             raise FileNotFoundError(f"Subtitle file not found: {ass_file}")
-
         if end_time <= 0:
             raise ValueError("End time must be positive")
 
@@ -108,9 +118,7 @@ class VideoEditor:
             if actual_end_time <= 0:
                 raise ValueError("Calculated video duration is not positive")
 
-            first_audio_duration = self._get_duration(audio_files[0]) if audio_files else 0
-            if first_audio_duration <= 0:
-                first_audio_duration = 1.0
+            first_audio_duration = self._get_duration(audio_files[0]) if audio_files else 1.0
             input_video = self._add_card(input_video, card, first_audio_duration, input_duration)
 
             concat_list = "concat_list.txt"
@@ -118,18 +126,24 @@ class VideoEditor:
                 for audio_file in audio_files:
                     f.write(f"file '{audio_file}'\n")
 
-            cmd = ["ffmpeg", "-y"]
+            has_audio = self._has_audio(input_video)
 
-            if end_time > input_duration:
-                cmd += ["-stream_loop", "-1"]
+            cmd = ["ffmpeg", "-y", "-i", input_video, "-f", "concat", "-safe", "0", "-i", concat_list]
 
-            cmd += ["-i", input_video, "-f", "concat", "-safe", "0", "-i", concat_list]
-            filter_complex = "[0:a:0][1:a:0]amix=inputs=2:duration=longest:dropout_transition=0,aresample=async=1000[a]"
+            if has_audio:
+                filter_complex = "[0:a:0][1:a:0]amix=inputs=2:duration=longest:dropout_transition=0,aresample=async=1000[a]"
+                cmd += [
+                    "-filter_complex", filter_complex,
+                    "-map", "0:v:0",
+                    "-map", "[a]",
+                ]
+            else:
+                cmd += [
+                    "-map", "0:v:0",
+                    "-map", "1:a:0",
+                ]
 
             cmd += [
-                "-filter_complex", filter_complex,
-                "-map", "0:v:0",
-                "-map", "[a]",
                 "-vf", f"ass={ass_file},scale=720:1280:force_original_aspect_ratio=decrease,pad=720:1280:(ow-iw)/2:(oh-ih)/2",
                 "-c:v", "libx264",
                 "-c:a", "aac",
@@ -138,6 +152,7 @@ class VideoEditor:
                 "-t", str(actual_end_time),
                 "output.mp4"
             ]
+
             logging.info(f"Running final FFmpeg command: {' '.join(cmd)}")
             subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
@@ -148,23 +163,23 @@ class VideoEditor:
 
             if not os.path.exists("output.mp4") or os.path.getsize("output.mp4") == 0:
                 raise RuntimeError("Failed to generate output video (file is empty or doesn't exist)")
+
             logging.info("✅ Short generated at output.mp4")
             return "output.mp4"
 
         except subprocess.CalledProcessError as e:
             error_output = e.stderr.decode() if hasattr(e, 'stderr') else str(e)
             logging.error(f"FFmpeg command failed: {error_output}")
-
-            if 'concat_list' in locals() and os.path.exists(concat_list):
+            if concat_list and os.path.exists(concat_list):
                 os.remove(concat_list)
-            if 'input_video' in locals() and os.path.exists(input_video):
+            if input_video and os.path.exists(input_video):
                 os.remove(input_video)
-
             raise Exception(f"Error while generating video: {error_output}")
+
         except Exception as e:
             logging.error(f"Unexpected error: {str(e)}")
-            if 'concat_list' in locals() and os.path.exists(concat_list):
+            if concat_list and os.path.exists(concat_list):
                 os.remove(concat_list)
-            if 'input_video' in locals() and os.path.exists(input_video):
+            if input_video and os.path.exists(input_video):
                 os.remove(input_video)
             raise

@@ -131,7 +131,7 @@ class Core:
  
                 timeline = self.speech_handler.speak(self.preset.voice)
                 end_time, ass_file = self.caption_handler.generate_ass(captions_list, timeline)
-                path = self.media_handler.process_media(self.preset.template, self.preset.audio)
+                path = self.media_handler.process_media(self.preset.template, end_time, self.preset.audio)
                 card = self.card_handler.get_card(self.preset.name, intro, self.preset.pfp_path)
                 self.video_editor.generate_video(end_time, path, card, ass_file)
 
