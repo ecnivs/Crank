@@ -10,18 +10,14 @@ from card_handler import CardHandler
 import argparse
 
 class Core:
-    def __init__(self, preset = None, script = None, template = None):
-        self.preset_path = f"presets/{preset}.json"
+    def __init__(self):
         self.res_handler = ResponseHandler()
         self.video_editor = VideoEditor()
         self.speech_handler = SpeechHandler()
         self.caption_handler = CaptionHandler()
         self.media_handler = MediaHandler()
         self.card_handler = CardHandler()
-        self.preset = PresetHandler(self.preset_path, script, template)
         self.delay = DELAY
-        if self.preset.upload:
-            self.youtube_handler = YoutubeHandler(self.preset.name.lower())
 
     def _split_for_shorts(self, captions, max_words=20):
         if not captions or not isinstance(captions, str):
@@ -113,7 +109,12 @@ class Core:
             return self.preset.intro_message
         return self.res_handler.gemini(captions, GET_INTRO)
 
-    def run(self):
+    def run(self, preset = None, script = None, template = None):
+        self.preset_path = f"presets/{preset}.json"
+        self.preset = PresetHandler(self.preset_path, script, template)
+        if self.preset.upload:
+            self.youtube_handler = YoutubeHandler(self.preset.name.lower())
+
         captions = None
         try:
             while self.preset:
@@ -162,5 +163,5 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--script", help="Insert Script")
     parser.add_argument("-t", "--template", help="Select template")
     args = parser.parse_args()
-    core = Core(args.preset, args.script, args.template)
-    core.run()
+    core = Core()
+    core.run(args.preset, args.script, args.template)

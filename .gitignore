@@ -7,5 +7,6 @@ presets/
 *.json
 .env
 *.sh
+*run.py
 *.mp4
 *.png
