@@ -112,9 +112,8 @@ Each sentence must be clear, concise, conversational, and under 15 words but few
 Keep punctuation minimal. Prioritize smooth rhythm over strict grammar.
 The output should sound like natural spoken narration, not formal writing.
 Ensure that any information returned is accurate and upto date.
-If your response is based on older data:
-- Clearly label it as such and flag any parts that might be outdated or disproved.
-- Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
+Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
+If your response is based on older data clearly label it as such and flag any parts that might be outdated or disproved.
 """
 
 DISCLAIMER = """
