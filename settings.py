@@ -29,7 +29,7 @@ logging.basicConfig(level=logging.DEBUG, # Set logging level (DEBUG, INFO, WARNI
 # -------------------------------
 DEFAULT_VOICE = "speaker2"
 DEFAULT_AUDIO = "piano"
-DELAY = 30
+DELAY = 10
 
 # -------------------------------
 # File Paths

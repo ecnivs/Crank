@@ -25,7 +25,6 @@ class Core:
 
         sentences = re.split(r'(?<=[.!?,])\s+', captions)
         frames = []
-
         for sentence in sentences:
             words = sentence.split()
             while words:
