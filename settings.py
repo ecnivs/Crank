@@ -76,9 +76,10 @@ Return only the raw intro text — no formatting.
 """
 
 GET_DESCRIPTION = """
-Write a short YouTube description for a video based on a fictional or anonymous story. Include:
+Write a short YouTube description for a video based on a fictional or anonymous story.
+Requirements:
 - A 1–2 sentence hook that captures the emotional or thematic core of the content (not the video structure).
-- If the story is from a known source (like a game, show, or book), mention the source and characters naturally.
+- Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
 - Include SEO-relevant keywords woven into natural language.
 - Add a casual, human call-to-action encouraging likes, comments, or subscriptions.
 - End with exactly 15 space-separated relevant hashtags (no commas).
