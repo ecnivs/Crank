@@ -127,12 +127,14 @@ python main.py -p <preset_name> [-s <script>] [-t <template_path>]
 ```
 #### Arguments:
 - `-p, --preset` (required): Name of the preset (without .json, must exist inside presets/)
-- `-s, --script` (optional): Path to a custom script file (overrides auto-generated content)
+- `-s, --script` (optional): Custom script text (overrides auto-generated content)
 - `-t, --template` (optional): Path to a specific template (overrides what's in the preset)
+
 #### Example:
 ```bash
 python main.py -p example
 ```
+
 ## 🛣️ Roadmap
 Here's what’s planned for Crank going forward:
 - [ ] GUI preset editor (drag-and-drop config builder)
