@@ -1,4 +1,6 @@
 # Crank 🎬
+> Shorts without sweat. Crank it.
+
 **Crank** is an automated YouTube Shorts generator built for speed, customization, and scalability. It uses presets to rapidly produce high-quality Shorts with zero manual editing.
 
 ## ⚙️ Features
