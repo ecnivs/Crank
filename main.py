@@ -1,3 +1,4 @@
+from googleapiclient.http import ResumableUploadError
 from settings import *
 from video_editor import VideoEditor
 from res_handler import ResponseHandler
@@ -63,9 +64,9 @@ class Core:
             )
             if cleaned_title not in self.preset.used_content:
                 self.preset.add_to_used(cleaned_title)
-        except Exception as e:
+        except Exception:
             logging.info(video_title, description, tags)
-            raise RuntimeError(f"[Upload Failed] {type(e).__name__}: {e}")
+            raise
 
     def _save_video(self, video_title):
         safe_title = re.sub(r'[\\/*?:"<>|]', "_", video_title)
@@ -75,11 +76,11 @@ class Core:
         destination = os.path.join(preset_folder, f"{safe_title}.mp4")
 
         if not os.path.exists(source_path):
-            raise FileNotFoundError(f"Cannot save video: '{source_path}' does not exist.")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Cannot save video: '{source_path}' does not exist.")
         try:
             shutil.move(source_path, destination)
         except Exception as e:
-            raise IOError(f"Failed to save video to '{destination}': {e}")
+            raise IOError(f"[{self.__class__.__name__}] Failed to save video to '{destination}'") from e
 
     def _get_content(self):
         used = ", ".join(self.preset.used_content or [])
@@ -109,13 +110,13 @@ class Core:
         return self.res_handler.gemini(captions, GET_INTRO)
 
     def run(self, preset = None, script = None, template = None):
-        self.preset_path = f"presets/{preset}.json"
-        self.preset = PresetHandler(self.preset_path, script, template)
-        if self.preset.upload:
-            self.youtube_handler = YoutubeHandler(self.preset.name.lower())
-
         captions = None
         try:
+            self.preset_path = f"presets/{preset}.json"
+            self.preset = PresetHandler(self.preset_path, script, template)
+            if self.preset.upload:
+                self.youtube_handler = YoutubeHandler(self.preset.name.lower())
+
             while self.preset:
                 captions = self._get_captions()
                 if not captions:
@@ -150,8 +151,12 @@ class Core:
                 captions = None
         except KeyboardInterrupt:
             logging.info("Shutting down...")
+        except ResumableUploadError:
+            logging.error("Upload limit exceeded")
+        except RuntimeError as e:
+            logging.critical(e)
         except Exception as e:
-            logging.exception(f"Unexpected Error: {e}")
+            logging.error(f"Unexpected Error: {e}")
         finally:
             if captions:
                 self.preset.add_to_pending(captions)

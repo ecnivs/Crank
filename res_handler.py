@@ -18,8 +18,7 @@ class ResponseHandler:
                 return re.sub(r'\s+', ' ', values_list[1]).strip()
             return None
         except Exception as e:
-            logging.error(f"Error fetching sheet data: {e}")
-            raise
+            raise RuntimeError(f"[{self.__class__.__name__}] Could not fetch sheet data") from e
 
     def _get_payload(self, query, prompt):
         payload = {
@@ -49,10 +48,6 @@ class ResponseHandler:
                     endpoint = ENDPOINT_1
                 retries += 1
                 time.sleep(delay * (2 ** retries))
-            except (ValueError, TypeError) as e:
-                logging.error(f"Failed to cast response to {data_type}: {e}")
-                raise
             except Exception as e:
-                logging.error(f"Unexpected error: {e}")
-                raise
+                raise Exception(f"[{self.__class__.__name__}] Could not fetch response from Gemini") from e
         raise Exception("Max retries exceeded")

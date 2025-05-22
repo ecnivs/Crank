@@ -30,9 +30,9 @@ class PresetHandler:
                 logging.info(f"Loaded preset: {path}")
                 return json.load(file)
         except FileNotFoundError:
-            raise FileNotFoundError(f"{path} does not exist.")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] {path} does not exist.")
         except json.JSONDecodeError:
-            raise ValueError(f"Error decoding JSON from {path}")
+            raise ValueError(f"[{self.__class__.__name__}] Error decoding JSON from {path}")
 
     def _get(self, key, default=None):
         return self.data.get(key, default)
@@ -68,7 +68,7 @@ class PresetHandler:
         elif isinstance(self.prompt, str):
             return self.prompt
         else:
-            raise ValueError("Invalid PROMPT format in preset")
+            raise ValueError(f"[{self.__class__.__name__}] Invalid PROMPT format in preset")
 
     def _write_data(self):
         try:

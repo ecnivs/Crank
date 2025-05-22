@@ -6,7 +6,7 @@ class VideoEditor:
 
     def _get_duration(self, video):
         if not os.path.exists(video):
-            raise FileNotFoundError(f"File not found: {video}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] File not found: {video}")
         cmd = [
             "ffprobe",
             "-v", "error",
@@ -19,18 +19,18 @@ class VideoEditor:
             info = json.loads(output)
 
             if 'format' not in info or 'duration' not in info['format']:
-                raise RuntimeError(f"Could not extract duration from {video}")
+                raise RuntimeError(f"[{self.__class__.__name__}] Could not extract duration from {video}")
 
             return float(info['format']['duration'])
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"FFprobe failed: {e.output.decode() if hasattr(e, 'output') else str(e)}")
-        except json.JSONDecodeError:
-            raise RuntimeError(f"Failed to parse FFprobe output for {video}")
+            raise RuntimeError(f"[{self.__class__.__name__}] FFprobe failed: {e.output.decode() if hasattr(e, 'output') else str(e)}") from e
+        except json.JSONDecodeError as e:
+            raise RuntimeError(f"[{self.__class__.__name__}] Failed to parse FFprobe output for {video}") from e
 
     def _get_frames(self):
         frames_dir = 'frames'
         if not os.path.isdir(frames_dir):
-            raise FileNotFoundError(f"Directory not found: {frames_dir}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Directory not found: {frames_dir}")
 
         frames = []
         for file in os.listdir(frames_dir):
@@ -38,7 +38,7 @@ class VideoEditor:
                 frames.append(file)
 
         if not frames:
-            raise ValueError("No .wav files found in 'frames' directory")
+            raise ValueError(f"[{self.__class__.__name__}] No .wav files found in 'frames' directory")
 
         frames.sort(key=lambda f: int(re.search(r'(\d+)', f).group()))
         return [os.path.join(frames_dir, f) for f in frames]
@@ -46,7 +46,7 @@ class VideoEditor:
     def _add_card(self, input_video, card, first_audio_duration, duration):
         for file_path, file_desc in [(input_video, "input video"), (card, "card image")]:
             if not os.path.exists(file_path):
-                raise FileNotFoundError(f"{file_desc.capitalize()} not found: {file_path}")
+                raise FileNotFoundError(f"[{self.__class__.__name__}] {file_desc.capitalize()} not found: {file_path}")
 
         with tempfile.NamedTemporaryFile(delete=False, suffix='.mp4') as temp_file:
             output_path = temp_file.name
@@ -74,7 +74,7 @@ class VideoEditor:
             logging.info(f"Video generated successfully with card! Saved as {output_path}")
 
             if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
-                raise RuntimeError("Failed to create output video (file is empty or doesn't exist)")
+                raise RuntimeError(f"[{self.__class__.__name__}] Failed to create output video (file is empty or doesn't exist)")
 
             if os.path.exists(input_video) and input_video != output_path:
                 os.remove(input_video)
@@ -86,7 +86,7 @@ class VideoEditor:
 
             if os.path.exists(output_path):
                 os.remove(output_path)
-            raise RuntimeError(f"Failed to add card to video: {error_output}")
+            raise RuntimeError(f"[{self.__class__.__name__}] Failed to add card to video: {error_output}") from e
 
     def _has_audio(self, video_path):
         cmd = [
@@ -101,13 +101,13 @@ class VideoEditor:
 
     def generate_video(self, end_time, input_video, card, ass_file):
         if not os.path.exists(input_video):
-            raise FileNotFoundError(f"Input video not found: {input_video}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Input video not found: {input_video}")
         if not os.path.exists(card):
-            raise FileNotFoundError(f"Card image not found: {card}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Card image not found: {card}")
         if not os.path.exists(ass_file):
-            raise FileNotFoundError(f"Subtitle file not found: {ass_file}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Subtitle file not found: {ass_file}")
         if end_time <= 0:
-            raise ValueError("End time must be positive")
+            raise ValueError(f"[{self.__class__.__name__}] End time must be positive")
 
         concat_list = None
         try:
@@ -116,7 +116,7 @@ class VideoEditor:
             input_duration = self._get_duration(input_video)
             actual_end_time = min(end_time, self.duration, input_duration)
             if actual_end_time <= 0:
-                raise ValueError("Calculated video duration is not positive")
+                raise ValueError(f"[{self.__class__.__name__}] Calculated video duration is not positive")
 
             first_audio_duration = self._get_duration(audio_files[0]) if audio_files else 1.0
             input_video = self._add_card(input_video, card, first_audio_duration, input_duration)
@@ -162,7 +162,7 @@ class VideoEditor:
                 os.remove(input_video)
 
             if not os.path.exists("output.mp4") or os.path.getsize("output.mp4") == 0:
-                raise RuntimeError("Failed to generate output video (file is empty or doesn't exist)")
+                raise RuntimeError(f"[{self.__class__.__name__}] Failed to generate output video (file is empty or doesn't exist)")
 
             logging.info("✅ Short generated at output.mp4")
             return "output.mp4"
@@ -174,12 +174,11 @@ class VideoEditor:
                 os.remove(concat_list)
             if input_video and os.path.exists(input_video):
                 os.remove(input_video)
-            raise Exception(f"Error while generating video: {error_output}")
+            raise RuntimeError(f"[{self.__class__.__name__}] Error while generating video: {error_output}") from e
 
         except Exception as e:
-            logging.error(f"Unexpected error: {str(e)}")
             if concat_list and os.path.exists(concat_list):
                 os.remove(concat_list)
             if input_video and os.path.exists(input_video):
                 os.remove(input_video)
-            raise
+            raise RuntimeError(f"[{self.__class__.__name__}] Could not generate video: {e}") from e

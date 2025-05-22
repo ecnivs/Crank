@@ -17,10 +17,10 @@ class CaptionHandler:
 
     def generate_ass(self, captions, timeline):
         if not captions:
-            raise ValueError("Caption list cannot be empty.")
+            raise ValueError(f"[{self.__class__.__name__}] Caption list cannot be empty.")
 
         if len(timeline) < len(captions) + 1:
-            raise ValueError("Timeline must have at least one more element than captions.")
+            raise ValueError(f"[{self.__class__.__name__}] Timeline must have at least one more element than captions.")
 
         header = """[Script Info]
 ScriptType: v4.00+
@@ -51,8 +51,7 @@ Format: Layer, Start, End, Style, Text
                 f.write("\n".join(caption_lines))
             logging.info(f"✅ ASS file generated at {self.ass_file}")
         except Exception as e:
-            logging.error(f"❌ Failed to write ASS file: {e}")
-            raise
+            raise RuntimeError(f"[{self.__class__.__name__}] Failed to write ASS file") from e
 
         time.sleep(0.1)
         return video_end_time, self.ass_file

@@ -58,4 +58,4 @@ class SpeechHandler:
             self.text_list = []
             return timeline
         except Exception as e:
-            raise RuntimeError(f"TTS processing failed: {e}")
+            raise RuntimeError(f"[{self.__class__.__name__}] TTS processing failed") from e

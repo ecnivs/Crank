@@ -12,7 +12,7 @@ class MediaHandler:
     def process_media(self, path, end_time, audio_path=None):
         self.duration = end_time
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Path does not exist: {path}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Path does not exist: {path}")
 
         output_path = self._create_output_path()
         logging.info(f"Processing media from {path}, audio from {audio_path}")
@@ -37,17 +37,17 @@ class MediaHandler:
 
             return output
         except Exception as e:
-            raise Exception(f"Error processing media: {e}")
+            raise RuntimeError(f"[{self.__class__.__name__}] Error processing media") from e
 
     def _process_video(self, video_path, output_path):
         ext = os.path.splitext(video_path.lower())[1]
         if ext not in self.supported_exts:
-            raise ValueError(f"Unsupported file type: {ext}")
+            raise ValueError(f"[{self.__class__.__name__}] Unsupported file type: {ext}")
 
         cap = cv2.VideoCapture(video_path)
         if not cap.isOpened():
             cap.release()
-            raise ValueError(f"Could not open video file: {video_path}")
+            raise ValueError(f"[{self.__class__.__name__}] Could not open video file: {video_path}")
         time.sleep(0.1)
 
         fps = cap.get(cv2.CAP_PROP_FPS)
@@ -65,7 +65,7 @@ class MediaHandler:
     def _process_folder(self, folder_path, output_path):
         video_files = self._get_video_files(folder_path)
         if not video_files:
-            raise ValueError(f"No supported video files in: {folder_path}")
+            raise ValueError(f"[{self.__class__.__name__}] No supported video files in: {folder_path}")
 
         valid_videos = []
         video_durations = {}
@@ -89,7 +89,7 @@ class MediaHandler:
             video_durations[abs_path] = duration
 
         if not valid_videos:
-            raise ValueError("No valid video files found or accessible")
+            raise ValueError(f"[{self.__class__.__name__}] No valid video files found or accessible")
 
         temp_dir = os.path.join(tempfile.gettempdir(), "video_clips")
         os.makedirs(temp_dir, exist_ok=True)
@@ -226,7 +226,7 @@ class MediaHandler:
 
     def _add_audio(self, video_path, audio_path):
         if not os.path.exists(audio_path):
-            raise FileNotFoundError(f"Audio path does not exist: {audio_path}")
+            raise FileNotFoundError(f"[{self.__class__.__name__}] Audio path does not exist: {audio_path}")
 
         temp_output = video_path + "_with_audio.mp4"
         cmd = [

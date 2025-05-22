@@ -1,4 +1,5 @@
 from settings import *
+from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -15,6 +16,20 @@ class YoutubeHandler:
         self._authenticate()
 
     def _authenticate(self):
+        try:
+            self._try_authenticate()
+        except RefreshError as e:
+            logging.error(f"[{self.__class__.__name__}] Refresh failed. Deleting token and retrying.")
+            if os.path.exists(self.token_file):
+                os.remove(self.token_file)
+            try:
+                self._try_authenticate()
+            except Exception as retry_error:
+                raise RuntimeError(f"[{self.__class__.__name__}] Retry after token deletion failed.") from retry_error
+        except Exception as e:
+            raise RuntimeError(f"[{self.__class__.__name__}] Authentication Failed.") from e
+
+    def _try_authenticate(self):
         if os.path.exists(self.token_file):
             self.credentials = Credentials.from_authorized_user_file(self.token_file, self.scopes)
 
