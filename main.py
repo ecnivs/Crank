@@ -14,11 +14,13 @@ class Core:
     def __init__(self):
         self.res_handler = ResponseHandler()
         self.video_editor = VideoEditor()
-        self.speech_handler = SpeechHandler()
         self.caption_handler = CaptionHandler()
         self.media_handler = MediaHandler()
         self.card_handler = CardHandler()
         self.delay = DELAY
+
+    async def _load_speech_handler(self):
+        self.speech_handler = await SpeechHandler.create()
 
     def _split_for_shorts(self, captions, max_words=20):
         if not captions or not isinstance(captions, str):
@@ -109,9 +111,24 @@ class Core:
             return self.preset.intro_message
         return self.res_handler.gemini(captions, GET_INTRO)
 
-    def run(self, preset = None, script = None, template = None):
+    async def _process_all(self, captions_list, intro):
+        timeline = await self.speech_handler.speak(self.preset.voice)
+        end_time, ass_file = await asyncio.to_thread(
+            self.caption_handler.generate_ass, captions_list, timeline
+        )
+        media_task = self.media_handler.process_media(self.preset.template, end_time, self.preset.audio)
+        card_task = asyncio.to_thread(
+            self.card_handler.get_card, self.preset.name, intro, self.preset.pfp_path
+        )
+        path, card = await asyncio.gather(media_task, card_task)
+        await asyncio.to_thread(
+            self.video_editor.generate_video, end_time, path, card, ass_file
+        )
+
+    async def run(self, preset = None, script = None, template = None):
         captions = None
         try:
+            load_task = asyncio.create_task(self._load_speech_handler())
             self.preset_path = f"presets/{preset}.json"
             self.preset = PresetHandler(self.preset_path, script, template)
             if self.preset.upload:
@@ -126,28 +143,22 @@ class Core:
                 logging.info(f"Captions:\n{captions}")
                 intro = self._generate_intro(captions)
                 captions_list = [intro] + self._split_for_shorts(captions)
+                title = f"{self.res_handler.gemini(captions, GET_TITLE)} #shorts"
 
+                await load_task
                 for caption in captions_list:
                     self.speech_handler.add_text(caption)
- 
-                timeline = self.speech_handler.speak(self.preset.voice)
-                end_time, ass_file = self.caption_handler.generate_ass(captions_list, timeline)
-                path = self.media_handler.process_media(self.preset.template, end_time, self.preset.audio)
-                card = self.card_handler.get_card(self.preset.name, intro, self.preset.pfp_path)
-                self.video_editor.generate_video(end_time, path, card, ass_file)
+                await self._process_all(captions_list, intro)
 
-                title = f"{self.res_handler.gemini(captions, GET_TITLE)} #shorts"
                 if self.preset.upload:
                     self._upload(captions, title, intro)
-
                 if self.preset.save:
                     self._save_video(title)
-
                 if self.preset.script:
                     break
 
                 logging.info(f"Sleeping for {self.delay} seconds before the next run...")
-                time.sleep(self.delay)
+                await asyncio.sleep(self.delay)
                 captions = None
         except KeyboardInterrupt:
             logging.info("Shutting down...")
@@ -168,4 +179,4 @@ if __name__ == "__main__":
     parser.add_argument("-t", "--template", help="Select template")
     args = parser.parse_args()
     core = Core()
-    core.run(args.preset, args.script, args.template)
+    asyncio.run(core.run(args.preset, args.script, args.template))

@@ -9,7 +9,7 @@ class MediaHandler:
         self.duration = duration
         self.supported_exts = ['.mp4', '.mov', '.avi', '.mkv']
 
-    def process_media(self, path, end_time, audio_path=None):
+    async def process_media(self, path, end_time, audio_path=None):
         self.duration = end_time
         if not os.path.exists(path):
             raise FileNotFoundError(f"[{self.__class__.__name__}] Path does not exist: {path}")
@@ -17,23 +17,19 @@ class MediaHandler:
         output_path = self._create_output_path()
         logging.info(f"Processing media from {path}, audio from {audio_path}")
         logging.info(f"Output will be saved to {output_path}")
-
         try:
             if os.path.isdir(path):
-                output = self._process_folder(path, output_path)
+                output = await asyncio.to_thread(self._process_folder, path, output_path)
             else:
-                output = self._process_video(path, output_path)
+                output = await asyncio.to_thread(self._process_video, path, output_path)
 
             logging.info(f"Video processing complete: {output}")
-            time.sleep(0.1)
+            await asyncio.sleep(0.1)
 
-            if audio_path:
-                if not os.path.exists(audio_path):
-                    logging.warning(f"Audio path {audio_path} does not exist, skipping audio")
-                else:
-                    logging.info(f"Adding audio from {audio_path}")
-                    self._add_audio(output, audio_path)
-                    logging.info("Audio added successfully")
+            if audio_path and os.path.exists(audio_path):
+                logging.info(f"Adding audio from {audio_path}")
+                await asyncio.to_thread(self._add_audio, output, audio_path)
+                logging.info("Audio added successfully")
 
             return output
         except Exception as e:
@@ -48,7 +44,6 @@ class MediaHandler:
         if not cap.isOpened():
             cap.release()
             raise ValueError(f"[{self.__class__.__name__}] Could not open video file: {video_path}")
-        time.sleep(0.1)
 
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -69,7 +64,6 @@ class MediaHandler:
 
         valid_videos = []
         video_durations = {}
-
         for video_path in video_files:
             abs_path = os.path.abspath(str(video_path))
             if not os.path.exists(abs_path) or not os.access(abs_path, os.R_OK):
@@ -85,6 +79,9 @@ class MediaHandler:
             cap.release()
 
             duration = total_frames / fps
+            if duration < 5:
+                continue
+
             valid_videos.append(abs_path)
             video_durations[abs_path] = duration
 
@@ -100,7 +97,6 @@ class MediaHandler:
 
         while total_duration < self.duration:
             if len(selected_videos) == len(valid_videos):
-                logging.info("Reusing videos since all unique videos are used.")
                 selected_videos = set()
 
             video_path = random.choice(valid_videos)
@@ -109,9 +105,6 @@ class MediaHandler:
             selected_videos.add(video_path)
 
             duration = video_durations[video_path]
-            if duration < 5:
-                continue
-
             cap = cv2.VideoCapture(video_path)
             start_frame = random.randint(0, max(0, int(cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 5 * self.fps))
             cap.set(cv2.CAP_PROP_POS_FRAMES, start_frame)
@@ -123,7 +116,6 @@ class MediaHandler:
                     break
                 frame_resized = cv2.resize(frame, (self.output_width, self.output_height))
                 frames.append(frame_resized)
-
             cap.release()
 
             if len(frames) < 5 * self.fps:
@@ -146,7 +138,6 @@ class MediaHandler:
 
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         out = cv2.VideoWriter(output_path, fourcc, self.fps, (self.output_width, self.output_height))
-
         for clip_path in clip_paths:
             cap = cv2.VideoCapture(clip_path)
             while True:
@@ -170,8 +161,8 @@ class MediaHandler:
     def _get_video_files(self, folder_path):
         video_files = []
         for ext in self.supported_exts:
-            video_files.extend(list(Path(folder_path).glob(f'*{ext}')))
-            video_files.extend(list(Path(folder_path).glob(f'*{ext.upper()}')))
+            video_files.extend(Path(folder_path).glob(f'*{ext}'))
+            video_files.extend(Path(folder_path).glob(f'*{ext.upper()}'))
         return video_files
 
     def _copy_video(self, input_path, output_path):
@@ -250,7 +241,4 @@ class MediaHandler:
                 os.remove(temp_output)
 
     def _create_output_path(self):
-        return os.path.join(
-            tempfile.gettempdir(),
-            "processed_video.mp4"
-        )
+        return os.path.join(tempfile.gettempdir(), "processed_video.mp4")

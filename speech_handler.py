@@ -3,11 +3,16 @@ from TTS.api import TTS
 import torch
 
 class SpeechHandler:
-    def __init__(self):
+    def __init__(self, tts):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.tts = TTS(model_name=TTS_MODEL, progress_bar=False).to(self.device)
+        self.tts = tts.to(self.device)
         self.text_list = []
         self._ensure_frames_folder()
+
+    @classmethod
+    async def create(cls):
+        tts = await asyncio.to_thread(TTS, model_name=TTS_MODEL, progress_bar=False)
+        return cls(tts)
 
     def _ensure_frames_folder(self):
         os.makedirs(FRAMES_DIR, exist_ok=True)
@@ -34,26 +39,28 @@ class SpeechHandler:
             return
         self.text_list.append(text)
 
-    def speak(self, speaker, clear=True):
+    async def speak(self, speaker, clear=True):
         if clear:
-            self._clear_frames()
+            await asyncio.to_thread(self._clear_frames)
 
-        timeline, count, current_time = [0.0], 1, 0.0
-
+        timeline = [0.0]
+        current_time = 0.0
+        count = 1
         try:
             for item in self.text_list:
                 output_wav = os.path.join(FRAMES_DIR, f"frame_{count}.wav")
-                self.tts.tts_to_file(
+                await asyncio.to_thread(
+                    self.tts.tts_to_file,
                     item,
                     file_path=output_wav,
-                    speaker_wav = speaker,
+                    speaker_wav=speaker,
                     language='en'
                 )
-                audio_duration = self._get_audio_duration(output_wav)
-                current_time = current_time + audio_duration
+                audio_duration = await asyncio.to_thread(self._get_audio_duration, output_wav)
+                current_time += audio_duration
                 timeline.append(current_time)
                 count += 1
-                time.sleep(0.1)
+                await asyncio.sleep(0.05)
 
             self.text_list = []
             return timeline

@@ -14,6 +14,7 @@ from pydub import AudioSegment
 import cv2
 import numpy as np
 from dotenv import load_dotenv
+import asyncio
 
 load_dotenv()
 
