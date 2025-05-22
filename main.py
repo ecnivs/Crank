@@ -67,7 +67,6 @@ class Core:
             if cleaned_title not in self.preset.used_content:
                 self.preset.add_to_used(cleaned_title)
         except Exception:
-            logging.info(video_title, description, tags)
             raise
 
     def _save_video(self, video_title):
