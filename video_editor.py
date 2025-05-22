@@ -28,20 +28,11 @@ class VideoEditor:
             raise RuntimeError(f"[{self.__class__.__name__}] Failed to parse FFprobe output for {video}") from e
 
     def _get_frames(self):
-        frames_dir = 'frames'
-        if not os.path.isdir(frames_dir):
-            raise FileNotFoundError(f"[{self.__class__.__name__}] Directory not found: {frames_dir}")
-
-        frames = []
-        for file in os.listdir(frames_dir):
-            if file.endswith(".wav"):
-                frames.append(file)
-
+        frames = glob.glob("frames/*.wav")
         if not frames:
-            raise ValueError(f"[{self.__class__.__name__}] No .wav files found in 'frames' directory")
-
+            raise ValueError("No .wav files found in 'frames' directory")
         frames.sort(key=lambda f: int(re.search(r'(\d+)', f).group()))
-        return [os.path.join(frames_dir, f) for f in frames]
+        return frames
 
     def _add_card(self, input_video, card, first_audio_duration, duration):
         for file_path, file_desc in [(input_video, "input video"), (card, "card image")]:

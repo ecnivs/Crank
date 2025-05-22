@@ -131,7 +131,7 @@ class Core:
             if not hasattr(self, 'speech_handler') or self.speech_handler is None:
                 load_task = asyncio.create_task(self._load_speech_handler())
             else:
-                load_task = asyncio.sleep(0)
+                load_task = asyncio.create_task(asyncio.sleep(0))
             self.preset_path = f"presets/{preset}.json"
             self.preset = PresetHandler(self.preset_path, script, template)
             if self.preset.upload:
@@ -141,6 +141,7 @@ class Core:
                 captions = self._get_captions()
                 if not captions:
                     logging.error("No content to process.")
+                    load_task.cancel()
                     break
 
                 logging.info(f"Captions:\n{captions}")
