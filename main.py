@@ -128,7 +128,10 @@ class Core:
     async def run(self, preset = None, script = None, template = None):
         captions = None
         try:
-            load_task = asyncio.create_task(self._load_speech_handler())
+            if not hasattr(self, 'speech_handler') or self.speech_handler is None:
+                load_task = asyncio.create_task(self._load_speech_handler())
+            else:
+                load_task = asyncio.sleep(0)
             self.preset_path = f"presets/{preset}.json"
             self.preset = PresetHandler(self.preset_path, script, template)
             if self.preset.upload:
