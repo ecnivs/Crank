@@ -18,6 +18,10 @@ import asyncio
 
 load_dotenv()
 
+class OnCooldown(Exception):
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.args[0] if self.args else ''}"
+
 # -------------------------------
 # Logging Configuration
 # -------------------------------

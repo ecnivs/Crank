@@ -110,6 +110,14 @@ class Core:
             return self.preset.intro_message
         return self.res_handler.gemini(captions, GET_INTRO)
 
+    def _has_24_hours_passed(self):
+        if not self.preset.limit_time:
+            return True, datetime.timedelta(0)
+        limit_time_dt = datetime.datetime.fromisoformat(self.preset.limit_time)
+        elapsed = datetime.datetime.utcnow() - limit_time_dt
+        time_left = datetime.timedelta(seconds=max(0, int((datetime.timedelta(hours=24) - (datetime.datetime.utcnow() - datetime.datetime.fromisoformat(self.preset.limit_time))).total_seconds())))
+        return (elapsed >= datetime.timedelta(hours=24)), max(time_left, datetime.timedelta(0))
+
     async def _process_all(self, captions_list, intro):
         timeline = await self.speech_handler.speak(self.preset.voice)
         end_time, ass_file = await asyncio.to_thread(
@@ -134,7 +142,14 @@ class Core:
             self.preset_path = f"presets/{preset}.json"
             self.preset = PresetHandler(self.preset_path, script, template)
             if self.preset.upload:
-                self.youtube_handler = YoutubeHandler(self.preset.name.lower())
+                has_24_hours_passed, time_left = self._has_24_hours_passed()
+                if not has_24_hours_passed and not self.preset.save:
+                    load_task.cancel()
+                    raise OnCooldown(f"Wait for {time_left} before proceeding.")
+                elif not has_24_hours_passed and self.preset.save:
+                    self.youtube_handler = None
+                else:
+                    self.youtube_handler = YoutubeHandler(self.preset.name.lower())
 
             while self.preset:
                 captions = self._get_captions()
@@ -153,7 +168,7 @@ class Core:
                     self.speech_handler.add_text(caption)
                 await self._process_all(captions_list, intro)
 
-                if self.preset.upload:
+                if self.preset.upload and self.youtube_handler:
                     self._upload(captions, title, intro)
                 if self.preset.save:
                     self._save_video(title)
@@ -167,6 +182,9 @@ class Core:
             logging.info("Shutting down...")
         except ResumableUploadError:
             logging.error("Upload limit exceeded")
+            self.preset.set_limit_time()
+        except OnCooldown as e:
+            logging.error(e)
         except RuntimeError as e:
             logging.critical(e)
         except Exception as e:

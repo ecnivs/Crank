@@ -22,6 +22,7 @@ class YoutubeHandler:
             logging.error(f"[{self.__class__.__name__}] Refresh failed. Deleting token and retrying.")
             if os.path.exists(self.token_file):
                 os.remove(self.token_file)
+            self.credentials = None
             try:
                 self._try_authenticate()
             except Exception as retry_error:
@@ -30,7 +31,7 @@ class YoutubeHandler:
             raise RuntimeError(f"[{self.__class__.__name__}] Authentication Failed.") from e
 
     def _try_authenticate(self):
-        if os.path.exists(self.token_file):
+        if os.path.exists(self.token_file) and not self.credentials:
             self.credentials = Credentials.from_authorized_user_file(self.token_file, self.scopes)
 
         if not self.credentials or not self.credentials.valid:
@@ -38,7 +39,7 @@ class YoutubeHandler:
                 self.credentials.refresh(Request())
             else:
                 flow = InstalledAppFlow.from_client_secrets_file(self.secrets_file, self.scopes)
-                self.credentials = flow.run_local_server(port=0)
+                self.credentials = flow.run_local_server(port=0, open_browser=True)
 
             with open(self.token_file, 'w') as token:
                 token.write(self.credentials.to_json())

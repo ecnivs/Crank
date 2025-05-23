@@ -23,6 +23,7 @@ class PresetHandler:
         self.audio = self._get("AUDIO", DEFAULT_AUDIO)
         self.data.setdefault("USED_CONTENT", [])
         self.data.setdefault("PENDING", [])
+        self.data.setdefault("LIMIT_TIME", "")
 
     def _load_data(self, path):
         try:
@@ -45,6 +46,10 @@ class PresetHandler:
     def pending(self):
         return self.data["PENDING"]
 
+    @property
+    def limit_time(self):
+        return self.data["LIMIT_TIME"]
+
     def add_to_used(self, item):
         if item not in self.data["USED_CONTENT"] and self.prompt:
             self.data["USED_CONTENT"].append(item)
@@ -53,6 +58,11 @@ class PresetHandler:
     def add_to_pending(self, item):
         if item not in self.data["PENDING"] and self.prompt:
             self.data["PENDING"].append(item)
+            self._write_data()
+
+    def set_limit_time(self):
+        if self.prompt:
+            self.data["LIMIT_TIME"] = str(datetime.datetime.utcnow().isoformat())
             self._write_data()
 
     def get_pending(self):
