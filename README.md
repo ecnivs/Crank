@@ -62,10 +62,11 @@ Below is a breakdown of all supported fields:
 | `DESCRIPTION` | `string` | YouTube description. Auto-generated if not set. Supports multiline strings. |
 | `USED_CONTENT`| `array`  | Managed by Crank. Tracks what content has already been used. |
 | `PENDING`     | `array`  | Managed by Crank. Tracks content queued for processing. |
+| `LIMIT_TIME`  | `string` | Managed by Crank. Tracks the timestamp of the last `ResumableUploadError` caused by quota limits. Used to check if the cooldown period has passed before attempting another upload. |
 
 #### Notes
 
-- `USED_CONTENT` and `PENDING` are modified by Crank during runtime. Do not edit them manually unless you're clearing the state.
+- `USED_CONTENT`, `PENDING` and `LIMIT_TIME` are modified by Crank during runtime. Do not edit them manually unless you're clearing the state.
 - If both `SCRIPT` and `PROMPT` are empty, the preset will fail to generate anything unless scripted logic handles it.
 - Paths are relative to the Crank root directory unless absolute.
 
@@ -89,7 +90,8 @@ You can define multiple presets for different channels, formats, or content styl
   "TAGS": [],
   "DESCRIPTION": "",
   "USED_CONTENT": [],
-  "PENDING": []
+  "PENDING": [],
+  "LIMIT_TIME": ""
 }
 ```
 
