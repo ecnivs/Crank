@@ -13,7 +13,7 @@ import argparse
 class Core:
     def __init__(self):
         self.res_handler = ResponseHandler()
-        self.video_editor = VideoEditor()
+        self.video_editor = VideoEditor(duration=60.0)
         self.caption_handler = CaptionHandler()
         self.media_handler = MediaHandler()
         self.card_handler = CardHandler()
@@ -128,9 +128,7 @@ class Core:
             self.card_handler.get_card, self.preset.name, intro, self.preset.pfp_path
         )
         path, card = await asyncio.gather(media_task, card_task)
-        await asyncio.to_thread(
-            self.video_editor.generate_video, end_time, path, card, ass_file
-        )
+        self.video_editor.generate_video(end_time, path, card, ass_file)
 
     async def run(self, preset = None, script = None, template = None, ignore = False):
         captions = None

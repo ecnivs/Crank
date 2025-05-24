@@ -11,3 +11,4 @@ torch
 TTS
 cairosvg
 Pillow
+maturin
