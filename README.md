@@ -15,9 +15,10 @@
 ## 🛠️ Prerequisites
 - Python 3.x (Tested with Python 3.11 using `pyenv`)
 - Required Python libraries (listed in `requirements.txt`)
-- `ffmpeg` installed and available in your system PATH (required for video processing)  
+- The `video_editor` Python extension module (built from Rust source)
+- `ffmpeg` and `ffprobe` installed and available in your system PATH (required for video processing)  
 - Google API credentials for Google Sheets and YouTube automation (stored as JSON files, see below)
-- Voice files compatible with your setup for one-shot voice cloning (WAV samples) 
+- Voice files compatible with your setup for one-shot voice cloning (WAV samples)
 
 #### Environment Variables
 Crank uses a .env file to load sensitive keys and config values.
@@ -121,6 +122,18 @@ brew install ffmpeg  # macos
 # Windows (using Chocolatey)
 choco install ffmpeg  # windows
 ```
+
+#### Build and install the Rust extension modules
+For any Rust-based Python extension module in this project, follow these steps:
+```bash
+cd <module_directory>
+maturin build --release
+pip install target/wheels/<module_name>-*.whl
+```
+- Replace `<module_directory>` with the folder containing the Rust module you want to build.
+- Replace `<module_name>` with the crate name of the Rust module (usually matches the folder name).
+
+You **must** repeat this process for each Rust extension module included in the project.
 
 ## 🚀 Running Crank
 After installation and setup, you can run Crank from the command line using:
