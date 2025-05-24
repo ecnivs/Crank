@@ -132,21 +132,23 @@ class Core:
             self.video_editor.generate_video, end_time, path, card, ass_file
         )
 
-    async def run(self, preset = None, script = None, template = None):
+    async def run(self, preset = None, script = None, template = None, ignore = False):
         captions = None
         try:
             if not hasattr(self, 'speech_handler') or self.speech_handler is None:
                 load_task = asyncio.create_task(self._load_speech_handler())
             else:
                 load_task = asyncio.create_task(asyncio.sleep(0))
+
             self.preset_path = f"presets/{preset}.json"
             self.preset = PresetHandler(self.preset_path, script, template)
+
             if self.preset.upload:
                 has_24_hours_passed, time_left = self._has_24_hours_passed()
-                if not has_24_hours_passed and not self.preset.save:
+                if not has_24_hours_passed and not self.preset.save and not ignore:
                     load_task.cancel()
                     raise OnCooldown(f"Wait for {time_left} before proceeding.")
-                elif not has_24_hours_passed and self.preset.save:
+                elif not has_24_hours_passed and self.preset.save and not ignore:
                     self.youtube_handler = None
                 else:
                     self.youtube_handler = YoutubeHandler(self.preset.name.lower())
@@ -195,9 +197,10 @@ class Core:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--preset", help="Select Preset")
-    parser.add_argument("-s", "--script", help="Insert Script")
+    parser.add_argument("-p", "--preset", help="Select preset")
+    parser.add_argument("-s", "--script", help="Insert script")
     parser.add_argument("-t", "--template", help="Select template")
+    parser.add_argument("--ignore", help="Ignore cooldown")
     args = parser.parse_args()
     core = Core()
-    asyncio.run(core.run(args.preset, args.script, args.template))
+    asyncio.run(core.run(args.preset, args.script, args.template, args.ignore))
