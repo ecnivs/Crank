@@ -56,7 +56,7 @@ Below is a breakdown of all supported fields:
 | `SAVE`        | `boolean`| If true, the video will be saved locally. |
 | `CATEGORY`    | `int`    | YouTube category ID (e.g., 22 for People & Blogs). |
 | `SHEET_ID`    | `string` | Google Sheet ID used for sourcing dynamic or user-submitted content. |
-| `TEMPLATE`    | `string` | Path to a video file or a directory. If it’s a directory, Crank randomly picks clips from the videos inside to compose the background and transitions dynamically. This allows flexible, varied visual templates without manual video editing. |
+| `TEMPLATE`    | `string` | Optional path to a video file or a directory. If it’s a directory, Crank randomly picks clips from the videos inside to compose the background and transitions dynamically. This allows flexible, varied visual templates without manual video editing. Auto-generated if not provided. |
 | `PFP`         | `string` | Path to the profile image used in the video. |
 | `TAGS`        | `array`  | List of hashtags or keywords. Auto-generated if empty. |
 | `DESCRIPTION` | `string` | YouTube description. Auto-generated if not set. Supports multiline strings. |
