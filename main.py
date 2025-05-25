@@ -88,8 +88,7 @@ class Core:
     def _get_content(self):
         used = ", ".join(self.preset.used_content or [])
         logging.info(f"Used content: {used}")
-        prompt = f"{self.preset.get_prompt()}\n\nAvoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content."
-        return self.res_handler.gemini(prompt)
+        return self.res_handler.gemini(self.preset.get_prompt(), f"Avoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content.")
 
     def _get_captions(self):
         pending = self.preset.get_pending()
@@ -101,7 +100,7 @@ class Core:
             logging.info(f"Fetching from sheet: {self.preset.sheet_id}")
             sheet_text = self.res_handler.get_sheet_response(self.preset.sheet_id)
             if sheet_text:
-                return self.res_handler.gemini(f"Correct punctuation and spelling:\n{sheet_text}")
+                return self.res_handler.gemini(sheet_text, prompt="Correct the punctuation and spelling.")
         if self.preset.prompt:
             logging.info(f"Generating content.")
             return self._get_content()

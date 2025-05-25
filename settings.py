@@ -123,16 +123,21 @@ Return only the tags, separated by commas.
 """
 
 CONTENT_PROMPT = """
-Keep the response short, clear, and natural.
-Max 175 words, but use fewer if possible.
-The flow must sound natural when read aloud by a TTS engine.
-Avoid excessive commas, complex phrasing, and abrupt sentence breaks.
-Each sentence must be clear, concise, conversational, and under 15 words but fewer if possible.
-Keep punctuation minimal. Prioritize smooth rhythm over strict grammar.
-The output should sound like natural spoken narration, not formal writing.
-Ensure that any information returned is accurate and upto date.
-Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
-If your response is based on older data clearly label it as such and flag any parts that might be outdated or disproved.
+Given the following description, generate content for a YouTube short.
+Rules:
+- Keep the response short, clear, and natural.
+- Max 175 words, but use fewer if possible.
+- The flow must sound natural when read aloud by a TTS engine.
+- Avoid excessive commas, complex phrasing, and abrupt sentence breaks.
+- Each sentence must be clear, concise, conversational, and under 15 words but fewer if possible.
+- Keep punctuation minimal. Prioritize smooth rhythm over strict grammar.
+- The output should sound like natural spoken narration, not formal writing.
+- Ensure that any information returned is accurate and upto date.
+- Be direct, vivid, and engaging.
+- No introductions or fillers needed. No commentary, questions, or reactions.
+- Include surprising detail that will grab viewers' attention.
+- Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
+- If your response is based on older data clearly label it as such and flag any parts that might be outdated or disproved.
 """
 
 DISCLAIMER = """
