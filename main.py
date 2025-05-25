@@ -1,3 +1,4 @@
+from os import path
 from googleapiclient.http import ResumableUploadError
 from settings import *
 from video_editor import VideoEditor
@@ -119,12 +120,23 @@ class Core:
         time_left = datetime.timedelta(seconds=max(0, int((datetime.timedelta(hours=24) - (datetime.datetime.utcnow() - datetime.datetime.fromisoformat(self.preset.limit_time))).total_seconds())))
         return (elapsed >= datetime.timedelta(hours=24)), max(time_left, datetime.timedelta(0))
 
-    async def _process_all(self, captions_list, intro):
+    def _get_template(self, captions, end_time):
+        tags = self.res_handler.gemini(captions, GET_SEARCH_TAGS).split(",")
+        random.shuffle(tags)
+        max_results = min(-(-end_time // 5), 10)
+        for tag in tags:
+            urls = self.media_handler.lookup_templates(tag, max_results)
+            if urls and len(urls) > (max_results * 0.7):
+                return self.media_handler.download_templates(urls)
+        return None
+
+    async def _process_all(self, captions_list, intro, captions):
         timeline = await self.speech_handler.speak(self.preset.voice)
         end_time, ass_file = await asyncio.to_thread(
             self.caption_handler.generate_ass, captions_list, timeline
         )
-        media_task = self.media_handler.process_media(self.preset.template, end_time, self.preset.audio)
+        path = self.preset.template or self._get_template(captions, end_time)
+        media_task = self.media_handler.process_media(end_time, path, self.preset.audio)
         card_task = asyncio.to_thread(
             self.card_handler.get_card, self.preset.name, intro, self.preset.pfp_path
         )
@@ -167,7 +179,7 @@ class Core:
                 await load_task
                 for caption in captions_list:
                     self.speech_handler.add_text(caption)
-                await self._process_all(captions_list, intro)
+                await self._process_all(captions_list, intro, captions)
 
                 if self.preset.upload and self.youtube_handler:
                     self._upload(captions, title, intro)

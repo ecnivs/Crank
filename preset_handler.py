@@ -21,6 +21,7 @@ class PresetHandler:
         self.category_id = self._get("CATEGORY", 27)
         self.pfp_path = self._get("PFP")
         self.audio = self._get("AUDIO", DEFAULT_AUDIO)
+        self.used_content_count = self._get("USED_CONTENT_COUNT", 100)
         self.data.setdefault("USED_CONTENT", [])
         self.data.setdefault("PENDING", [])
         self.data.setdefault("LIMIT_TIME", "")
@@ -53,6 +54,9 @@ class PresetHandler:
     def add_to_used(self, item):
         if item not in self.data["USED_CONTENT"] and self.prompt:
             self.data["USED_CONTENT"].append(item)
+            excess = len(self.data["USED_CONTENT"]) - self.used_content_count
+            if excess > 0:
+                self.data["USED_CONTENT"] = self.data["USED_CONTENT"][excess:]
             self._write_data()
 
     def add_to_pending(self, item):

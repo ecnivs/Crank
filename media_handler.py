@@ -9,7 +9,7 @@ class MediaHandler:
         self.duration = duration
         self.supported_exts = ['.mp4', '.mov', '.avi', '.mkv']
 
-    async def process_media(self, path, end_time, audio_path=None):
+    async def process_media(self, end_time, path, audio_path = None):
         self.duration = end_time
         if not os.path.exists(path):
             raise FileNotFoundError(f"[{self.__class__.__name__}] Path does not exist: {path}")
@@ -26,14 +26,53 @@ class MediaHandler:
             logging.info(f"Video processing complete: {output}")
             await asyncio.sleep(0.1)
 
+            if os.path.basename(path).startswith("pixabay_") and os.path.isdir(path):
+                shutil.rmtree(path)
+
             if audio_path and os.path.exists(audio_path):
                 logging.info(f"Adding audio from {audio_path}")
                 await asyncio.to_thread(self._add_audio, output, audio_path)
                 logging.info("Audio added successfully")
-
             return output
         except Exception as e:
             raise RuntimeError(f"[{self.__class__.__name__}] Error processing media") from e
+
+    def lookup_templates(self, query, max_results = 10):
+        params = {
+            'key': os.getenv("PIXABAY_API_KEY"),
+            'q': query,
+            'per_page': max_results,
+            'safesearch': 'true',
+        }
+        try:
+            response = requests.get(PIXABAY_URL, params=params, timeout=10)
+            response.raise_for_status()
+            data = response.json()
+            hits = data.get('hits', [])
+            videos = []
+            for hit in hits:
+                tags = hit.get('tags', '').lower()
+                if all(word.lower() in tags for word in query.split()):
+                    videos.append(hit['videos']['medium']['url'])
+            return videos
+        except Exception as e:
+            raise RuntimeError(f"[{self.__class__.__name__}] Could not lookup templates") from e
+
+    def download_templates(self, urls):
+        temp_dir = tempfile.mkdtemp(prefix="pixabay_")
+        for i, url in enumerate(urls, 1):
+            try:
+                resp = requests.get(url, timeout=30)
+                if resp.status_code == 200:
+                    ext = url.split('.')[-1].split('?')[0]
+                    filepath = os.path.join(temp_dir, f"video_{i}.{ext}")
+                    with open(filepath, 'wb') as f:
+                        f.write(resp.content)
+                else:
+                    raise RuntimeError(f"[{self.__class__.__name__}] Failed to download (status {resp.status_code}): {url}")
+            except Exception as e:
+                raise RuntimeError(f"[{self.__class__.__name__}] Faild to download {url}") from e
+        return temp_dir
 
     def _process_video(self, video_path, output_path):
         ext = os.path.splitext(video_path.lower())[1]

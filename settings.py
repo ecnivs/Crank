@@ -54,10 +54,11 @@ EXCEPTION_ON_OVERFLOW = False # Prevent exceptions on buffer overflow
 RATE = SAMPLING_RATE # Audio rate (should match SAMPLING_RATE)
 
 # -------------------------------
-# LLM Configuration
+# API Urls
 # -------------------------------
 ENDPOINT_1 = f"https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key={os.getenv('GEMINI_API_KEY')}"
 ENDPOINT_2 = f"https://generativelanguage.googleapis.com/v1/models/gemini-2.0-flash:generateContent?key={os.getenv('GEMINI_API_KEY')}"
+PIXABAY_URL = "https://pixabay.com/api/videos/"
 
 # -------------------------------
 # Prompt Configuration
@@ -78,6 +79,18 @@ Avoid questions, reactions, or commentary.
 Use an attention-grabbing phrase like 'Here’s something you probably didn’t know' or 'You won’t believe this fact.'
 Make it feel like the viewer needs to keep watching to understand.
 Return only the raw intro text — no formatting.
+"""
+
+GET_SEARCH_TAGS = """
+Write short, catchy Pixabay video search tags (under 3 words) that visually represent the scene, theme, or emotion of the content below.
+Rules:
+- Focus on visually satisfying, mesmerizing or attention-grabbing elements.
+- Avoid tags that would show visible faces (hands, silhouettes, or body parts are okay)
+- Prioritize tags that return visually captivating, loop-worthy footage.
+- Use only simple, broad visual terms that return relevant videos on Pixabay.
+- If there is a direct visual subject, name only that subject (e.g., "Eiffel Tower").
+- Do not add modifiers, adjectives, or extra descriptive words that don’t clearly identify a visual element.
+- No explanations or extra text. Return only raw tags separated by commas.
 """
 
 GET_DESCRIPTION = """
