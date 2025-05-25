@@ -58,6 +58,7 @@ class Core:
 
         try:
             self.youtube_handler.upload(
+                channel_name=self.preset.name,
                 video_path=video_path,
                 title=video_title,
                 description=description,

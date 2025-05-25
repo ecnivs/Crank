@@ -46,7 +46,7 @@ class YoutubeHandler:
 
         self.service = build('youtube', 'v3', credentials=self.credentials)
 
-    def upload(self, video_path, title, description, tags: list, categoryId):
+    def upload(self, channel_name, video_path, title, description, tags: list, categoryId):
         body = {
             'snippet': {
                 'title': str(title),
@@ -66,5 +66,5 @@ class YoutubeHandler:
             media_body=media
         )
         response = request.execute()
-        logging.info(f"✅ Uploaded successfully. Video ID: {response['id']}")
+        logging.info(f"✅ Uploaded to '{channel_name}' successfully. Video ID: {response['id']}")
         return response['id']
