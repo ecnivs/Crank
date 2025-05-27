@@ -1,5 +1,6 @@
 from settings import *
 from pathlib import Path
+from duckduckgo_search import DDGS
 
 class MediaHandler:
     def __init__(self, output_width=1080, output_height=1920, fps=30, duration=60):
@@ -26,7 +27,7 @@ class MediaHandler:
             logging.info(f"Video processing complete: {output}")
             await asyncio.sleep(0.1)
 
-            if os.path.basename(path).startswith("pixabay_") and os.path.isdir(path):
+            if os.path.basename(path).startswith("template_") and os.path.isdir(path):
                 shutil.rmtree(path)
 
             if audio_path and os.path.exists(audio_path):
@@ -36,6 +37,82 @@ class MediaHandler:
             return output
         except Exception as e:
             raise RuntimeError(f"[{self.__class__.__name__}] Error processing media") from e
+
+    def _download_images(self, query, temp_dir, max_results=10):
+        count = 0
+        allowed_mime = {"image/jpeg", "image/png", "image/webp"}
+        allowed_ext = {"jpg", "jpeg", "png", "webp"}
+
+        with DDGS() as ddgs:
+            results = ddgs.images(query, max_results=max_results * 2)
+            for r in results:
+                if count >= max_results:
+                    break
+                image_url = r["image"]
+                try:
+                    response = requests.get(image_url, timeout=10)
+                    content_type = response.headers.get("Content-Type", "").split(";")[0]
+
+                    if content_type not in allowed_mime:
+                        logging.warning(f"⚠️ Skipping non-static image: {image_url} ({content_type})")
+                        continue
+
+                    ext = content_type.split("/")[-1]
+                    ext = "jpg" if ext == "jpeg" else ext
+
+                    if ext not in allowed_ext:
+                        continue
+
+                    image_path = os.path.join(temp_dir, f"{uuid.uuid4()}.{ext}")
+                    with open(image_path, "wb") as f:
+                        f.write(response.content)
+                    logging.info(f"✅ Downloaded: {image_path}")
+                    count += 1
+
+                except Exception as e:
+                    logging.error(f"❌ Failed: {image_url} ({e})")
+        return temp_dir
+
+    def get_templates(self, query, max_results = 10):
+        temp_dir = tempfile.mkdtemp(prefix="template_")
+        self._download_images(query, temp_dir, max_results = max_results)
+        for img_file in Path(temp_dir).glob("*"):
+            output_path = os.path.join(temp_dir, f"{img_file.stem}.mp4")
+            vf_filter = (
+                "format=yuv420p,"
+                "zoompan="
+                "z='1+0.3*(on/210)':"
+                f"d={7 * self.fps}:"
+                f"s={self.output_width}x{self.output_height}:"
+                "x='(iw-ow)/2':"
+                "y='(ih-oh)/2',"
+                f"scale={self.output_width}:{self.output_height}:force_original_aspect_ratio=increase"
+            )
+            cmd = [
+                "ffmpeg",
+                "-y",
+                "-loop", "1",
+                "-i", str(img_file),
+                "-vf", vf_filter,
+                "-t", "7",
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-pix_fmt", "yuv420p",
+                "-r", str(self.fps),
+                "-movflags", "+faststart",
+                output_path
+            ]
+            try:
+                subprocess.run(cmd, check=True, capture_output=True, text=True)
+                logging.info(f"🎞️ Created video: {output_path}")
+                if os.path.exists(output_path) and os.path.getsize(output_path) > 0:
+                    os.remove(img_file)
+                else:
+                    raise RuntimeError(f"[{self.__class__.__name__}] Video creation failed: {output_path}")
+            except subprocess.CalledProcessError as e:
+                logging.error(f"FFmpeg stderr: {e.stderr}")
+                raise RuntimeError(f"[{self.__class__.__name__}] FFmpeg failed on {img_file.name}: {e}")
+        return temp_dir
 
     def lookup_templates(self, query, max_results = 10):
         params = {
@@ -59,7 +136,7 @@ class MediaHandler:
             raise RuntimeError(f"[{self.__class__.__name__}] Could not lookup templates") from e
 
     def download_templates(self, urls):
-        temp_dir = tempfile.mkdtemp(prefix="pixabay_")
+        temp_dir = tempfile.mkdtemp(prefix="template_")
         for i, url in enumerate(urls, 1):
             try:
                 resp = requests.get(url, timeout=30)
@@ -71,7 +148,7 @@ class MediaHandler:
                 else:
                     raise RuntimeError(f"[{self.__class__.__name__}] Failed to download (status {resp.status_code}): {url}")
             except Exception as e:
-                raise RuntimeError(f"[{self.__class__.__name__}] Faild to download {url}") from e
+                raise RuntimeError(f"[{self.__class__.__name__}] Failed to download {url}") from e
         return temp_dir
 
     def _process_video(self, video_path, output_path):

@@ -87,8 +87,9 @@ class Core:
 
     def _get_content(self):
         used = ", ".join(self.preset.used_content or [])
-        logging.info(f"Used content: {used}")
-        return self.res_handler.gemini(self.preset.get_prompt(), f"Avoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content.")
+        if used:
+            logging.info(f"Used content: {used}")
+        return self.res_handler.gemini(f"{self.preset.get_prompt()}\n\nAvoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content.")
 
     def _get_captions(self):
         pending = self.preset.get_pending()
@@ -120,21 +121,26 @@ class Core:
         return (elapsed >= datetime.timedelta(hours=24)), max(time_left, datetime.timedelta(0))
 
     def _get_template(self, captions, end_time):
-        tags = self.res_handler.gemini(captions, GET_SEARCH_TAGS).split(",")
-        random.shuffle(tags)
+        tags = self.res_handler.gemini(captions, GET_SEARCH_TAGS).split(", ")
+        logging.info(tags)
+        selector = tags.pop(0)
         max_results = min(-(-end_time // 5), 10)
+        if not "stock" in selector:
+            return self.media_handler.get_templates(f"{' '.join(tags)} art", max_results)
+        random.shuffle(tags)
         for tag in tags:
             urls = self.media_handler.lookup_templates(tag, max_results)
             if urls and len(urls) > (max_results * 0.7):
-                return self.media_handler.download_templates(urls)
-        return None
+                result = self.media_handler.download_templates(urls)
+                if result is not None:
+                    return result
 
-    async def _process_all(self, captions_list, intro, captions):
+    async def _process_all(self, captions_list, intro):
         timeline = await self.speech_handler.speak(self.preset.voice)
         end_time, ass_file = await asyncio.to_thread(
             self.caption_handler.generate_ass, captions_list, timeline
         )
-        path = self.preset.template or self._get_template(captions, end_time)
+        path = self.preset.template or self._get_template(' '.join(captions_list), end_time)
         media_task = self.media_handler.process_media(end_time, path, self.preset.audio)
         card_task = asyncio.to_thread(
             self.card_handler.get_card, self.preset.name, intro, self.preset.pfp_path
@@ -178,7 +184,7 @@ class Core:
                 await load_task
                 for caption in captions_list:
                     self.speech_handler.add_text(caption)
-                await self._process_all(captions_list, intro, captions)
+                await self._process_all(captions_list, intro)
 
                 if self.preset.upload and self.youtube_handler:
                     self._upload(captions, title, intro)

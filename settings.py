@@ -15,6 +15,7 @@ import cv2
 import numpy as np
 from dotenv import load_dotenv
 import asyncio
+import uuid
 
 load_dotenv()
 
@@ -82,15 +83,20 @@ Return only the raw intro text — no formatting.
 """
 
 GET_SEARCH_TAGS = """
-Write short, catchy Pixabay video search tags (under 3 words) that visually represent the scene, theme, or emotion of the content below.
+Generate video search tags from the provided content.
 Rules:
-- Focus on visually satisfying, mesmerizing or attention-grabbing elements.
-- Avoid tags that would show visible faces (hands, silhouettes, or body parts are okay)
-- Prioritize tags that return visually captivating, loop-worthy footage.
-- Use only simple, broad visual terms that return relevant videos on Pixabay.
-- If there is a direct visual subject, name only that subject (e.g., "Eiffel Tower").
-- Do not add modifiers, adjectives, or extra descriptive words that don’t clearly identify a visual element.
-- No explanations or extra text. Return only raw tags separated by commas.
+- First tag must be either "stock" or "niche":
+- Use "stock" if the content can be illustrated with generic, stock-style footage (e.g. nature, emotions, concepts or nothing too specific).
+- Use "niche" if it references specific fandoms, fictional worlds, or topics not typically found in stock video (e.g. anime, games, characters).
+- After that, write 3–5 short, visually captivating Pixabay search tags (max 3 words each).
+
+Tags must:
+- Be loop-worthy, visually satisfying, or striking
+- Avoid unrelated faces; hands/silhouettes/body parts are okay
+- Focus on nouns (e.g. "lava", "forest", "cityscape")
+- Avoid modifiers/adjectives or verbs (no "beautiful forest", just "forest")
+- If a clear subject exist, name it directly and prioritize character name. (e.g. Character/Game/Anime/Movie names)
+Return tags as a comma-separated list with **no explanation**.
 """
 
 GET_DESCRIPTION = """
