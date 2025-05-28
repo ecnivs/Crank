@@ -68,6 +68,7 @@ class MediaHandler:
                         f.write(response.content)
                     logging.info(f"✅ Downloaded: {image_path}")
                     count += 1
+                    time.sleep(random.uniform(0.1, 1))
 
                 except Exception as e:
                     logging.error(f"❌ Failed: {image_url} ({e})")

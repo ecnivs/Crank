@@ -121,11 +121,11 @@ class Core:
         return (elapsed >= datetime.timedelta(hours=24)), max(time_left, datetime.timedelta(0))
 
     def _get_template(self, captions, end_time):
-        tags = self.res_handler.gemini(captions, GET_SEARCH_TAGS).split(", ")
+        tags = self.res_handler.gemini(f"(prompt:[{self.preset.get_prompt()}] content:[{captions}])", GET_SEARCH_TAGS).split(", ")
         logging.info(tags)
         max_results = min(-(-end_time // 5), 10)
         if not "stock" in tags[0]:
-            return self.media_handler.get_templates(f"{' '.join(tags)} art", max_results)
+            return self.media_handler.get_templates(f"{' '.join(tags)} 4k", max_results)
         random.shuffle(tags)
         for tag in tags:
             if "stock" in tag:
