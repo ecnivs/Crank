@@ -123,12 +123,13 @@ class Core:
     def _get_template(self, captions, end_time):
         tags = self.res_handler.gemini(captions, GET_SEARCH_TAGS).split(", ")
         logging.info(tags)
-        selector = tags.pop(0)
         max_results = min(-(-end_time // 5), 10)
-        if not "stock" in selector:
+        if not "stock" in tags[0]:
             return self.media_handler.get_templates(f"{' '.join(tags)} art", max_results)
         random.shuffle(tags)
         for tag in tags:
+            if "stock" in tag:
+                continue
             urls = self.media_handler.lookup_templates(tag, max_results)
             if urls and len(urls) > (max_results * 0.7):
                 result = self.media_handler.download_templates(urls)

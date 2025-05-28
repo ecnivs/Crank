@@ -85,9 +85,9 @@ Return only the raw intro text — no formatting.
 GET_SEARCH_TAGS = """
 Generate video search tags from the provided content.
 Rules:
-- First tag must be either "stock" or "niche":
+- First tag must be either "stock" or the source:
 - Use "stock" if the content can be illustrated with generic, stock-style footage (e.g. nature, emotions, concepts or nothing too specific).
-- Use "niche" if it references specific fandoms, fictional worlds, or topics not typically found in stock video (e.g. anime, games, characters).
+- Use the source if it references specific fandoms, fictional worlds, or topics not typically found in stock video (e.g. anime, games, movies).
 - After that, write 3–5 short, visually captivating Pixabay search tags (max 3 words each).
 
 Tags must:
