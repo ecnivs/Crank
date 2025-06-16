@@ -199,8 +199,8 @@ class Core:
                 captions = None
         except KeyboardInterrupt:
             logging.info("Shutting down...")
-        except ResumableUploadError:
-            logging.error("Upload limit exceeded")
+        except ResumableUploadError as e:
+            logging.error(f"Upload limit exceeded: {e}")
             self.preset.set_limit_time()
         except OnCooldown as e:
             logging.error(e)

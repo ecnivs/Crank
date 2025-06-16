@@ -38,40 +38,73 @@ class MediaHandler:
         except Exception as e:
             raise RuntimeError(f"[{self.__class__.__name__}] Error processing media") from e
 
-    def _download_images(self, query, temp_dir, max_results=10):
+    def _download_images(self, query, temp_dir, max_results=10, max_retries=5):
         count = 0
         allowed_mime = {"image/jpeg", "image/png", "image/webp"}
         allowed_ext = {"jpg", "jpeg", "png", "webp"}
 
-        with DDGS() as ddgs:
-            results = ddgs.images(query, max_results=max_results * 2)
-            for r in results:
-                if count >= max_results:
-                    break
-                image_url = r["image"]
+        def download_image(url):
+            for attempt in range(max_retries):
                 try:
-                    response = requests.get(image_url, timeout=10)
-                    content_type = response.headers.get("Content-Type", "").split(";")[0]
-
-                    if content_type not in allowed_mime:
-                        logging.warning(f"⚠️ Skipping non-static image: {image_url} ({content_type})")
+                    response = requests.get(url, headers=FAKE_HEADERS, timeout=10)
+                    if response.status_code == 429:
+                        wait = 2 ** attempt + random.uniform(0.5, 2.0)
+                        logging.warning(f"⚠️ Rate limited. Retrying in {wait:.2f}s...")
+                        time.sleep(wait)
                         continue
+                    if response.status_code == 403:
+                        logging.warning(f"❌ Forbidden (403): {url}")
+                        return None
+                    if response.status_code != 200:
+                        raise Exception(f"Bad status: {response.status_code}")
+
+                    content_type = response.headers.get("Content-Type", "").split(";")[0]
+                    if content_type not in allowed_mime:
+                        logging.warning(f"⚠️ Skipping unsupported image: {url} ({content_type})")
+                        return None
 
                     ext = content_type.split("/")[-1]
                     ext = "jpg" if ext == "jpeg" else ext
-
                     if ext not in allowed_ext:
-                        continue
+                        return None
 
-                    image_path = os.path.join(temp_dir, f"{uuid.uuid4()}.{ext}")
-                    with open(image_path, "wb") as f:
+                    path = os.path.join(temp_dir, f"{uuid.uuid4()}.{ext}")
+                    with open(path, "wb") as f:
                         f.write(response.content)
-                    logging.info(f"✅ Downloaded: {image_path}")
-                    count += 1
-                    time.sleep(random.uniform(0.1, 1))
+                    return path
 
                 except Exception as e:
-                    logging.error(f"❌ Failed: {image_url} ({e})")
+                    logging.warning(f"❌ Failed to download ({attempt+1}/{max_retries}): {url} ({e})")
+                    time.sleep(2 ** attempt + random.uniform(0.2, 1.0))
+            return None
+
+        for attempt in range(max_retries):
+            try:
+                with DDGS() as ddgs:
+                    results = ddgs.images(query, max_results=max_results * 2)
+                    if not results:
+                        raise Exception("No image results returned")
+
+                    for result in results:
+                        if count >= max_results:
+                            break
+                        image_url = result["image"]
+                        path = download_image(image_url)
+                        if path:
+                            logging.info(f"✅ Downloaded: {path}")
+                            count += 1
+                            time.sleep(random.uniform(0.3, 1.0))
+
+            except Exception as e:
+                wait = 2 ** attempt + random.uniform(1, 3)
+                logging.warning(f"⚠️ Search failed ({attempt+1}/{max_retries}): {e}. Retrying in {wait:.2f}s...")
+                time.sleep(wait)
+
+            if count >= max_results:
+                break
+
+        if count == 0:
+            logging.error("❌ No images downloaded after all retries.")
         return temp_dir
 
     def get_templates(self, query, max_results = 10):

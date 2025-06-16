@@ -23,6 +23,17 @@ class OnCooldown(Exception):
     def __str__(self):
         return f"{self.__class__.__name__}: {self.args[0] if self.args else ''}"
 
+FAKE_HEADERS = {
+    "User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "AppleWebKit/537.36 (KHTML, like Gecko) "
+        "Chrome/114.0.0.0 Safari/537.36"
+    ),
+    "Referer": "https://duckduckgo.com/",
+    "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
 # -------------------------------
 # Logging Configuration
 # -------------------------------
