@@ -209,7 +209,7 @@ class Core:
         except Exception as e:
             logging.error(f"Unexpected Error: {e}")
         finally:
-            if captions:
+            if captions and not self.preset.prompt:
                 self.preset.add_to_pending(captions)
 
 if __name__ == "__main__":
