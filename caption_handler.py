@@ -29,7 +29,8 @@ PlayResY: 1080
 
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Dynamic, Mono, 65, &H00FFFFFF, &H00000000, &H00000000, &H64000000, 1, 0, 0, 0, 100, 100, -0.2, 0, 1, 2, 1, 5, 80, 80, 40, 1
+Style: Dynamic, Luckiest Guy, 75, &H00FFFF00, &H000000FF, &H00000000, &H96000000, 1, 0, 0, 0, 100, 100, 0, 0, 1, 4, 3, 5, 80, 80, 40, 1
+
 
 [Events]
 Format: Layer, Start, End, Style, Text
