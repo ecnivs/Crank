@@ -152,17 +152,6 @@ python main.py -p <preset_name> [-s <script>] [-t <template_path>]
 python main.py -p example
 ```
 
-## 🛣️ Roadmap
-Here's what’s planned for Crank going forward:
-- [ ] GUI preset editor (drag-and-drop config builder)
-- [ ] Multi-voice support per preset (dialogue-style shorts)
-- [ ] Auto voice cloning from raw YouTube/TikTok links
-- [ ] Web-based interface for remote control / no local setup
-- [ ] Multi-stage Gemini calls to simulate memory/contextual storytelling
-- [ ] AI-driven template generation
-- [ ] Docker setup for isolated deployment
-Feature requests or PRs welcome. If it makes content creation faster, it's on the table.
-
 ## 💖 Support the project
 If you find Crank helpful and want to support its development, donations are welcome!  
 Your support helps keep the project active and enables new features.
