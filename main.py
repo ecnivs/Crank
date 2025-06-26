@@ -27,6 +27,7 @@ class Core:
         if not captions or not isinstance(captions, str):
             return []
 
+        captions = captions.replace("*", "")
         sentences = re.split(r'(?<=[.!?,])\s+', captions)
         frames = []
         for sentence in sentences:
@@ -122,14 +123,9 @@ class Core:
 
     def _get_template(self, captions, end_time):
         tags = self.res_handler.gemini(f"(prompt:[{self.preset.get_prompt()}] content:[{captions}])", GET_SEARCH_TAGS).split(", ")
-        logging.info(tags)
         max_results = min(-(-end_time // 5), 10)
-        if not "stock" in tags[0]:
-            return self.media_handler.get_templates(f"{' '.join(tags)} 4k", max_results)
         random.shuffle(tags)
         for tag in tags:
-            if "stock" in tag:
-                continue
             urls = self.media_handler.lookup_templates(tag, max_results)
             if urls and len(urls) > (max_results * 0.7):
                 result = self.media_handler.download_templates(urls)

@@ -23,17 +23,6 @@ class OnCooldown(Exception):
     def __str__(self):
         return f"{self.__class__.__name__}: {self.args[0] if self.args else ''}"
 
-FAKE_HEADERS = {
-    "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
-        "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/114.0.0.0 Safari/537.36"
-    ),
-    "Referer": "https://duckduckgo.com/",
-    "Accept": "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
-    "Accept-Language": "en-US,en;q=0.9",
-}
-
 # -------------------------------
 # Logging Configuration
 # -------------------------------
@@ -44,8 +33,8 @@ logging.basicConfig(level=logging.DEBUG, # Set logging level (DEBUG, INFO, WARNI
 # -------------------------------
 # Preferences
 # -------------------------------
-DEFAULT_VOICE = "speaker2"
-DEFAULT_AUDIO = "piano"
+DEFAULT_VOICE = "voices/speaker.wav"
+DEFAULT_AUDIO = "audio/piano.wav"
 DELAY = 10
 
 # -------------------------------
@@ -85,29 +74,23 @@ Given the following YouTube video content, generate a catchy, concise, and SEO-o
 """
 
 GET_INTRO = """
-Read the content and create a powerful, curiosity-sparking intro in under 10 words for a YouTube Short.
-The intro should imply a reveal, mystery, or hidden truth.
-Avoid questions, reactions, or commentary.
-Use an attention-grabbing phrase like 'Here’s something you probably didn’t know' or 'You won’t believe this fact.'
-Make it feel like the viewer needs to keep watching to understand.
+Read the content and generate a powerful, curiosity-sparking intro in under 10 words for a YouTube Short.
+The intro should imply a hidden truth, bold theory, or surprising possibility.
+It should spark intrigue and make the viewer feel like they need to keep watching to understand the full picture.
+Use an attention-grabbing phrase like 'Here’s something you probably didn’t know' or 'You won’t believe this theory.'
+Avoid reactions, opinions, or vague commentary.
 Return only the raw intro text — no formatting.
 """
 
 GET_SEARCH_TAGS = """
-Generate video search tags from the provided content.
-Rules:
-- First tag must be either "stock" or the source:
-- Use "stock" if the content can be illustrated with generic, stock-style footage (e.g. nature, emotions, concepts or nothing too specific).
-- Use the source if it references specific fandoms, fictional worlds, or topics not typically found in stock video (e.g. anime, games, movies).
-- After that, write 3–5 short, visually captivating Pixabay search tags (max 3 words each).
-
+Generate Pixabay video search tags from the provided content.
 Tags must:
 - Be loop-worthy, visually satisfying, or striking
 - Avoid unrelated faces; hands/silhouettes/body parts are okay
 - Focus on nouns (e.g. "lava", "forest", "cityscape")
 - Avoid modifiers/adjectives or verbs (no "beautiful forest", just "forest")
 - If a clear subject exist, name it directly and prioritize character name. (e.g. Character/Game/Anime/Movie names)
-Return tags as a comma-separated list with **no explanation**.
+Return tags as a comma-separated list with no explanation.
 """
 
 GET_DESCRIPTION = """
@@ -151,7 +134,7 @@ Rules:
 - The output should sound like natural spoken narration, not formal writing.
 - Ensure that any information returned is accurate and upto date.
 - Be direct, vivid, and engaging.
-- No introductions or fillers needed. No commentary, questions, or reactions.
+- No introductions or fillers needed. No commentary, questions, greetings, or reactions.
 - Include surprising detail that will grab viewers' attention.
 - Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
 - If your response is based on older data clearly label it as such and flag any parts that might be outdated or disproved.
