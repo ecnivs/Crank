@@ -41,6 +41,7 @@ class ResponseHandler:
                 response = self.session.post(endpoint, json=self._get_payload(query, prompt))
                 response.raise_for_status()
                 response_text = response.json()["candidates"][0]["content"]["parts"][0]["text"]
+                response_text = response_text.replace("*", "")
                 return data_type(response_text)
             except requests.exceptions.RequestException as e:
                 logging.error(f"Request failed: {e}")

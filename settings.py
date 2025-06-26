@@ -122,7 +122,7 @@ Return only the tags, separated by commas.
 """
 
 CONTENT_PROMPT = """
-Given the prompt, generate content for a YouTube short.
+Given the above query, generate content for a YouTube short.
 Rules:
 - Do NOT respond with 'Here's a Youtube short script'
 - Keep the response short, clear, and natural.

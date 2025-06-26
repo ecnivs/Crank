@@ -26,8 +26,6 @@ class Core:
     def _split_for_shorts(self, captions, max_words=20):
         if not captions or not isinstance(captions, str):
             return []
-
-        captions = captions.replace("*", "")
         sentences = re.split(r'(?<=[.!?,])\s+', captions)
         frames = []
         for sentence in sentences:
@@ -90,7 +88,7 @@ class Core:
         used = ", ".join(self.preset.used_content or [])
         if used:
             logging.info(f"Used content: {used}")
-        return self.res_handler.gemini(f"{self.preset.get_prompt()}\n\nAvoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content.")
+        return self.res_handler.gemini(self.preset.get_prompt(), f"{CONTENT_PROMPT}\n\nAvoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content.")
 
     def _get_captions(self):
         pending = self.preset.get_pending()
