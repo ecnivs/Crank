@@ -75,9 +75,8 @@ Given the following YouTube video content, generate a catchy, concise, and SEO-o
 
 GET_INTRO = """
 Read the content and generate a powerful, curiosity-sparking intro in under 10 words for a YouTube Short.
-The intro should imply a hidden truth, bold theory, or surprising possibility.
 It should spark intrigue and make the viewer feel like they need to keep watching to understand the full picture.
-Use an attention-grabbing phrase like 'Here’s something you probably didn’t know' or 'You won’t believe this theory.'
+Use attention-grabbing phrases like 'Here’s something you probably didn’t know' or 'You won’t believe' or unanswered questions.
 Avoid reactions, opinions, or vague commentary.
 Return only the raw intro text — no formatting.
 """
@@ -123,8 +122,9 @@ Return only the tags, separated by commas.
 """
 
 CONTENT_PROMPT = """
-Given the following description, generate content for a YouTube short.
+Given the prompt, generate content for a YouTube short.
 Rules:
+- Do NOT respond with 'Here's a Youtube short script'
 - Keep the response short, clear, and natural.
 - Max 175 words, but use fewer if possible.
 - The flow must sound natural when read aloud by a TTS engine.
@@ -138,6 +138,7 @@ Rules:
 - Include surprising detail that will grab viewers' attention.
 - Embed source and if needed date in a natural narrative way using phrases like "According to" or "As recorded in".
 - If your response is based on older data clearly label it as such and flag any parts that might be outdated or disproved.
+- End with a strong, conversational call to action for comments and subscribes — keep it short and natural.
 """
 
 DISCLAIMER = """
