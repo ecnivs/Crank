@@ -1,0 +1,15 @@
+[package]
+name = "video_editor"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "video_editor"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.18", features = ["extension-module"] }
+tempfile = "3.5"
+glob = "0.3"
+regex = "1"
+serde_json = "1.0"

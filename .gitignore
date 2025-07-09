@@ -1,0 +1,14 @@
+__pycache__/
+templates/
+video_editor/target/
+saved_videos/
+json/
+frames/
+presets/
+*.json
+.env
+*.sh
+run.py
+*.mp4
+*.png
+*_test.py
