@@ -12,3 +12,4 @@ run.py
 *.mp4
 *.png
 *.txt
+*_test.py
