@@ -1,4 +1,3 @@
-from os import path
 from googleapiclient.http import ResumableUploadError
 from settings import *
 from video_editor import VideoEditor
