@@ -47,27 +47,20 @@ Below is a breakdown of all supported fields:
 | Field         | Type     | Description |
 |---------------|----------|-------------|
 | `NAME`        | `string` | Internal identifier for the preset. Used for logging or UI display. |
-| `INTRO_MSG`   | `string` | Optional intro text shown or spoken at the start. Auto-generated if not provided. |
-| `SCRIPT`      | `string` | Static script text. If set, it overrides any prompt-based generation. |
 | `PROMPT`      | `string` | Prompt sent to the language model to generate the script. Ignored if `SCRIPT` is used. |
 | `VOICE`       | `string` | Path to the TTS voice file (e.g., `voices/speaker.wav`). |
 | `AUDIO`       | `string` | Optional background music or ambience (e.g., `audio/piano.wav`). |
 | `UPLOAD`      | `boolean`| If true, the final video will be flagged for upload. |
-| `SAVE`        | `boolean`| If true, the video will be saved locally. |
 | `CATEGORY`    | `int`    | YouTube category ID (e.g., 22 for People & Blogs). |
-| `SHEET_ID`    | `string` | Google Sheet ID used for sourcing dynamic or user-submitted content. |
 | `TEMPLATE`    | `string` | Optional path to a video file or a directory. If it’s a directory, Crank randomly picks clips from the videos inside to compose the background and transitions dynamically. This allows flexible, varied visual templates without manual video editing. Auto-generated if not provided. |
 | `PFP`         | `string` | Path to the profile image used in the video. |
-| `TAGS`        | `array`  | List of hashtags or keywords. Auto-generated if empty. |
-| `DESCRIPTION` | `string` | YouTube description. Auto-generated if not set. Supports multiline strings. |
 | `USED_CONTENT`| `array`  | Managed by Crank. Tracks what content has already been used. |
-| `PENDING`     | `array`  | Managed by Crank. Tracks content queued for processing. |
 | `LIMIT_TIME`  | `string` | Managed by Crank. Tracks the timestamp of the last `ResumableUploadError` caused by quota limits. Used to check if the cooldown period has passed before attempting another upload. |
 
 #### Notes
 
-- `USED_CONTENT`, `PENDING` and `LIMIT_TIME` are modified by Crank during runtime. Do not edit them manually unless you're clearing the state.
-- If both `SCRIPT` and `PROMPT` are empty, the preset will fail to generate anything unless scripted logic handles it.
+- `USED_CONTENT` and `LIMIT_TIME` are modified by Crank during runtime. Do not edit them manually unless you're clearing the state.
+- If `PROMPT` is empty, the preset will fail to generate anything.
 - Paths are relative to the Crank root directory unless absolute.
 
 You can define multiple presets for different channels, formats, or content styles and switch between them instantly.
@@ -76,21 +69,14 @@ You can define multiple presets for different channels, formats, or content styl
 ```json
 {
   "NAME": "Crank",
-  "INTRO_MSG": "This is a test short.",
-  "SCRIPT": "",
   "PROMPT": "Generate a test script for a youtube short.",
   "VOICE": "voices/speaker.wav",
   "AUDIO": "audio/piano.wav",
   "UPLOAD": false,
-  "SAVE": false,
   "CATEGORY": 22,
-  "SHEET_ID": "",
   "TEMPLATE": "templates/",
   "PFP": "",
-  "TAGS": [],
-  "DESCRIPTION": "",
   "USED_CONTENT": [],
-  "PENDING": [],
   "LIMIT_TIME": ""
 }
 ```
