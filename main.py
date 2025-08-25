@@ -16,7 +16,6 @@ class Core:
         self.media_handler = MediaHandler()
         self.card_handler = CardHandler()
         self.presets = self._load_all_presets("presets")
-        self.delay = DELAY
 
     async def _load_speech_handler(self):
         self.speech_handler = await SpeechHandler.create()
@@ -68,15 +67,6 @@ class Core:
         if used:
             logging.info(f"Used content: {used}")
         return (self.res_handler.gemini(self.preset.get_prompt(), f"{CONTENT_PROMPT}\n\nAvoid ALL topics related to: {used}\nReturn ONLY fresh, unrelated content."))
-
-    def _get_captions(self):
-        if self.preset.prompt:
-            logging.info(f"Generating content.")
-            return self._get_content()
-        return None
-
-    def _generate_intro(self, captions):
-        return self.res_handler.gemini(captions, GET_INTRO)
 
     def _has_24h_passed(self, preset):
         if not preset.limit_time:
@@ -145,17 +135,16 @@ class Core:
                 else:
                     load_task = asyncio.create_task(asyncio.sleep(0))
 
-                for preset in [p for p in self.presets if self._has_24h_passed(p)]:
+                for preset in [p for p in self.presets if self._has_24h_passed(p) and p.prompt]:
                     self.preset = preset
 
-                    captions = self._get_captions()
+                    captions = self._get_content()
                     if not captions:
-                        logging.error("No prompt")
-                        load_task.cancel()
+                        logging.error("No Captions")
                         continue
 
                     logging.info(f"Captions:\n{captions}")
-                    intro = self._generate_intro(captions)
+                    intro = self.res_handler.gemini(captions, GET_INTRO)
                     captions_list = [intro] + self._split_for_shorts(captions)
                     title = f"{self.res_handler.gemini(captions, GET_TITLE)}"
 
@@ -167,12 +156,11 @@ class Core:
                     if self.preset.upload and self.preset.youtube_handler:
                         self._upload(captions, title, intro)
 
-                    least_time_left = self._get_least_time_left()
-                    if least_time_left >= 120:
-                        self.speech_handler = None
-
-                    logging.info(f"Crank will continue in {least_time_left} secs")
-                    await asyncio.sleep(least_time_left)
+                least_time_left = self._get_least_time_left()
+                if least_time_left >= 120:
+                    self.speech_handler = None
+                logging.info(f"Crank will continue in {least_time_left} secs")
+                await asyncio.sleep(least_time_left)
         except RuntimeError as e:
             logging.critical(e)
         except KeyboardInterrupt:

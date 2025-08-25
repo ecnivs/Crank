@@ -19,10 +19,6 @@ import uuid
 
 load_dotenv()
 
-class OnCooldown(Exception):
-    def __str__(self):
-        return f"{self.__class__.__name__}: {self.args[0] if self.args else ''}"
-
 # -------------------------------
 # Logging Configuration
 # -------------------------------
@@ -31,17 +27,8 @@ logging.basicConfig(level=logging.DEBUG, # Set logging level (DEBUG, INFO, WARNI
                     force=True) # Override existing logging settings
 
 # -------------------------------
-# Preferences
-# -------------------------------
-DEFAULT_VOICE = "voices/speaker.wav"
-DEFAULT_AUDIO = "audio/piano.wav"
-DELAY = 10
-
-# -------------------------------
 # File Paths
 # -------------------------------
-SECRETS_JSON = "json/secrets.json"
-KEY_JSON = "json/key.json"
 FRAMES_DIR = "frames"
 
 # -------------------------------

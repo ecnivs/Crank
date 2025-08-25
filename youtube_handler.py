@@ -8,7 +8,7 @@ from googleapiclient.http import MediaFileUpload, ResumableUploadError
 
 class YoutubeHandler:
     def __init__(self, token_file):
-        self.secrets_file = SECRETS_JSON
+        self.secrets_file = "json/secrets.json"
         self.token_file = f"json/{token_file}.json"
         self.scopes = ["https://www.googleapis.com/auth/youtube.upload"]
         self.credentials = None
