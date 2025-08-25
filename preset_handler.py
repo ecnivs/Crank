@@ -50,10 +50,6 @@ class PresetHandler:
         return self.data["USED_CONTENT"]
 
     @property
-    def pending(self):
-        return self.data["PENDING"]
-
-    @property
     def limit_time(self):
         return self.data["LIMIT_TIME"]
 
@@ -65,22 +61,10 @@ class PresetHandler:
                 self.data["USED_CONTENT"] = self.data["USED_CONTENT"][excess:]
             self._write_data()
 
-    def add_to_pending(self, item):
-        if item not in self.data["PENDING"] and self.prompt:
-            self.data["PENDING"].append(item)
-            self._write_data()
-
     def set_limit_time(self):
         if self.prompt:
             self.data["LIMIT_TIME"] = str(datetime.datetime.utcnow().isoformat())
             self._write_data()
-
-    def get_pending(self):
-        if self.data["PENDING"]:
-            item = self.data["PENDING"].pop(0)
-            self._write_data()
-            return item
-        return None
 
     def get_prompt(self):
         if isinstance(self.prompt, dict):
