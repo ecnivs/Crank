@@ -51,19 +51,17 @@ class Core:
         cleaned_title = video_title.replace("#shorts", "").strip()
         video_path = getattr(self, "output_path", "output.mp4")
 
-        try:
-            self.preset.youtube_handler.upload(
-                channel_name=self.preset.name,
-                video_path=video_path,
-                title=video_title,
-                description=description,
-                tags=tags[:30],
-                categoryId=self.preset.category_id
-            )
-            if cleaned_title not in self.preset.used_content:
-                self.preset.add_to_used(cleaned_title)
-        except Exception:
-            raise
+        self.preset.youtube_handler.upload(
+            channel_name = self.preset.name,
+            video_path = video_path,
+            title = video_title,
+            description = description,
+            tags = tags[:30],
+            categoryId = self.preset.category_id,
+            preset = self.preset,
+        )
+        if cleaned_title not in self.preset.used_content:
+            self.preset.add_to_used(cleaned_title)
 
     def _get_content(self):
         used = ", ".join(self.preset.used_content or [])

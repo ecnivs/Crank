@@ -4,7 +4,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
-from googleapiclient.http import MediaFileUpload
+from googleapiclient.http import MediaFileUpload, ResumableUploadError
 
 class YoutubeHandler:
     def __init__(self, token_file):
@@ -46,25 +46,31 @@ class YoutubeHandler:
 
         self.service = build('youtube', 'v3', credentials=self.credentials)
 
-    def upload(self, channel_name, video_path, title, description, tags: list, categoryId):
-        body = {
-            'snippet': {
-                'title': str(title),
-                'description': str(description),
-                'tags': tags,
-                'categoryId': str(categoryId)
-            },
-            'status': {
-                'privacyStatus': 'public'
+    def upload(self, channel_name, video_path, title, description, tags: list, categoryId, preset):
+        try:
+            body = {
+                'snippet': {
+                    'title': str(title),
+                    'description': str(description),
+                    'tags': tags,
+                    'categoryId': str(categoryId)
+                },
+                'status': {
+                    'privacyStatus': 'public'
+                }
             }
-        }
 
-        media = MediaFileUpload(video_path, mimetype='video/*', resumable=True)
-        request = self.service.videos().insert(
-            part="snippet,status",
-            body=body,
-            media_body=media
-        )
-        response = request.execute()
-        logging.info(f"✅ Uploaded to '{channel_name}' successfully. Video ID: {response['id']}")
-        return response['id']
+            media = MediaFileUpload(video_path, mimetype='video/*', resumable=True)
+            request = self.service.videos().insert(
+                part="snippet,status",
+                body=body,
+                media_body=media
+            )
+            response = request.execute()
+            logging.info(f"✅ Uploaded to '{channel_name}' successfully. Video ID: {response['id']}")
+            return response['id']
+        except ResumableUploadError as e:
+            preset.set_limit_time()
+            logging.error(f"Failed to upload to '{channel_name}': {e}")
+        except Exception as e:
+            logging.error(f"Failed to upload to '{channel_name}': {e}")
