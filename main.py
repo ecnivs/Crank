@@ -6,6 +6,7 @@ from caption_handler import CaptionHandler
 from preset_handler import PresetHandler
 from media_handler import MediaHandler
 from card_handler import CardHandler
+from plyer import notification
 
 class Core:
     def __init__(self):
@@ -134,8 +135,12 @@ class Core:
         path, card = await asyncio.gather(media_task, card_task)
         self.video_editor.generate_video(end_time, path, card, ass_file)
 
+    def _notify(self, title, message, app_name = "Crank", timeout = 10):
+        notification.notify(title = title, message = message, app_name = app_name, timeout = timeout)
+
     async def run(self):
         try:
+            self._notify("Welcome Back!", "YT Shorts generation in progress.")
             while self.presets:
                 if not hasattr(self, 'speech_handler') or self.speech_handler is None:
                     load_task = asyncio.create_task(self._load_speech_handler())
