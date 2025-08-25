@@ -46,21 +46,19 @@ class Core:
 
         description = self.res_handler.gemini(captions, GET_DESCRIPTION)
         tags = [self.res_handler.gemini(f"{intro_message}: {description}", GET_TAGS).split(",")]
-
-        cleaned_title = video_title.replace("#shorts", "").strip()
         video_path = getattr(self, "output_path", "output.mp4")
 
         self.preset.youtube_handler.upload(
             channel_name = self.preset.name,
             video_path = video_path,
-            title = video_title,
+            title = f"{video_title} #shorts",
             description = description,
             tags = tags[:30],
             categoryId = self.preset.category_id,
             preset = self.preset,
         )
-        if cleaned_title not in self.preset.used_content:
-            self.preset.add_to_used(cleaned_title)
+        if video_title not in self.preset.used_content:
+            self.preset.add_to_used(video_title)
 
     def _get_content(self):
         used = ", ".join(self.preset.used_content or [])
@@ -135,7 +133,7 @@ class Core:
                 else:
                     load_task = asyncio.create_task(asyncio.sleep(0))
 
-                for preset in [p for p in self.presets if self._has_24h_passed(p) and p.prompt]:
+                for preset in (p for p in self.presets if self._has_24h_passed(p) and p.prompt):
                     self.preset = preset
 
                     captions = self._get_content()
@@ -159,7 +157,8 @@ class Core:
                 least_time_left = self._get_least_time_left()
                 if least_time_left >= 120:
                     self.speech_handler = None
-                logging.info(f"Crank will continue in {least_time_left} secs")
+                    load_task.cancel()
+                logging.info(f"Crank will continue in {str(datetime.timedelta(seconds = least_time_left))}")
                 await asyncio.sleep(least_time_left)
         except RuntimeError as e:
             logging.critical(e)
