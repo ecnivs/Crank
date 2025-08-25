@@ -90,6 +90,4 @@ Format: Layer, Start, End, Style, Text
             logging.info(f"✅ ASS file generated at {self.ass_file}")
         except Exception as e:
             raise RuntimeError(f"[{self.__class__.__name__}] Failed to write ASS file") from e
-
-        time.sleep(0.1)
         return video_end_time, self.ass_file

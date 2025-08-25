@@ -1,30 +1,36 @@
 from settings import *
+import random
+import json
+import os
+import datetime
+from youtube_handler import YoutubeHandler
 
 class PresetHandler:
-    def __init__(self, preset_path, script = None, template = None):
+    def __init__(self, preset_path):
         self.preset_path = preset_path
         self.data = self._load_data(self.preset_path)
-        self.template = template or self._get("TEMPLATE", "")
-        self.script = script or self._get("SCRIPT", "")
+        self.template = self._get("TEMPLATE", "")
         self._on_init()
 
     def _on_init(self):
         self.name = self._get("NAME")
         self.upload = self._get("UPLOAD", False)
-        self.save = self._get("SAVE", False)
-        self.description = self._get("DESCRIPTION", "")
-        self.tags = self._get("TAGS", [])
-        self.intro_message = self._get("INTRO_MSG", "")
-        self.voice = self._get("VOICE", DEFAULT_VOICE)
+        self.voice = self._get("VOICE", random.choice(self._load_files("voices")))
         self.prompt = self._get("PROMPT", {})
-        self.sheet_id = self._get("SHEET_ID", "")
         self.category_id = self._get("CATEGORY", 27)
         self.pfp_path = self._get("PFP")
-        self.audio = self._get("AUDIO", DEFAULT_AUDIO)
+        self.audio = self._get("AUDIO", random.choice(self._load_files("audio")))
         self.used_content_count = self._get("USED_CONTENT_COUNT", 100)
         self.data.setdefault("USED_CONTENT", [])
-        self.data.setdefault("PENDING", [])
         self.data.setdefault("LIMIT_TIME", "")
+        self.youtube_handler = YoutubeHandler(self.name.lower())
+
+    def _load_files(self, folder):
+        files = []
+        for file in os.listdir(folder):
+            if file.endswith(".wav"):
+                files.append(os.path.join(folder, file))
+        return files
 
     def _load_data(self, path):
         try:

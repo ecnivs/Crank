@@ -23,7 +23,6 @@ class CardHandler:
 
         image = Image.open(BytesIO(png_data))
         image.save(temp_file_path, format='PNG')
-        time.sleep(1)
         return temp_file_path
 
     def _generate_svg(self, username, content, profile_color, pfp_path=None):
@@ -53,7 +52,3 @@ class CardHandler:
             {text_elements}
         </svg>'''
         return svg_template
-
-    def cleanup(self, file_path):
-        if os.path.exists(file_path):
-            os.unlink(file_path)
