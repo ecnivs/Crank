@@ -9,12 +9,10 @@ from youtube_handler import YoutubeHandler
 from media_handler import MediaHandler
 from video_editor import VideoEditor
 import asyncio
-import os
-import time
 
 class Core:
     def __init__(self, workspace):
-        self.client = genai.Client(api_key = os.environ['GEMINI_API_KEY2'])
+        self.client = genai.Client()
         self.workspace = workspace
         self.state = StateHandler()
         self.media_handler = MediaHandler(workspace = self.workspace)
