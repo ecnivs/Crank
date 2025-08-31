@@ -3,4 +3,4 @@ __pycache__/
 *.yml
 .env
 *.mp4
-.venv
+.venv/
