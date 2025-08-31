@@ -1,6 +1,8 @@
 # Crank
 > Youtube Shorts Generator
 
+![1000223934](https://github.com/user-attachments/assets/e8d5f7aa-f06e-403b-8dd1-59032875a25f)
+
 ## Overview
 This repo is dedicated to showcasing the automation of YouTube Shorts for my channel [Ask Irminsul](https://www.youtube.com/@askirminsul). It’s actively used and maintained to generate content efficiently.
 
