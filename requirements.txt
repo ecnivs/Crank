@@ -1,0 +1,9 @@
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+google-generativeai
+whisper
+yt-dlp
+PyYAML
+python-dotenv
