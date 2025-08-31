@@ -8,7 +8,7 @@ class MediaHandler:
         self.workspace = Path(workspace)
 
     def _download_video(self, query, max_results=10):
-        query = f"Genshin Impact {query} cinematic"
+        query = f"Genshin Impact cinematic {query}"
         ydl_opts_search = {
             "quiet": True,
             "extract_flat": True,
@@ -53,20 +53,35 @@ class MediaHandler:
 
     def _clip_video(self, input_path):
         duration = self._get_video_duration(input_path)
-        start_time = max(0, (duration / 2) - 30)
         output_path = self.workspace / f"{input_path.stem}_short.mp4"
-        cmd = [
-            "ffmpeg", "-y",
-            "-ss", str(start_time),
-            "-i", str(input_path),
-            "-t", "60",
-            "-vf", "crop=ih*9/16:ih,scale=1080:1920",
-            "-c:v", "libx264",
-            "-preset", "fast",
-            "-crf", "23",
-            "-an",
-            str(output_path)
-        ]
+        if duration >= 60:
+            start_time = max(0, (duration / 2) - 30)
+            cmd = [
+                "ffmpeg", "-y",
+                "-ss", str(start_time),
+                "-i", str(input_path),
+                "-t", "60",
+                "-vf", "crop=ih*9/16:ih,scale=1080:1920,gblur=sigma=5",
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-crf", "23",
+                "-an",
+                str(output_path)
+            ]
+        else:
+            loops = int(60 / duration) + 1
+            cmd = [
+                "ffmpeg", "-y",
+                "-stream_loop", str(loops),
+                "-i", str(input_path),
+                "-t", "60",
+                "-vf", "crop=ih*9/16:ih,scale=1080:1920,gblur=sigma=5",
+                "-c:v", "libx264",
+                "-preset", "fast",
+                "-crf", "23",
+                "-an",
+                str(output_path)
+            ]
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return output_path
 

@@ -4,19 +4,17 @@ import wave
 import os
 import random
 
-# TODO: Increase speaking rate
-
 class SpeechHandler:
     def __init__(self, client, workspace):
         self.client = client
         self.workspace = workspace
 
-    def save_to_wav(self, pcm, channels=1, rate=24000, sample_width=2):
+    def save_to_wav(self, pcm):
         path = os.path.join(self.workspace, 'speech.wav')
         with wave.open(path, "wb") as wf:
-            wf.setnchannels(channels)
-            wf.setsampwidth(sample_width)
-            wf.setframerate(rate)
+            wf.setnchannels(1)
+            wf.setsampwidth(2)
+            wf.setframerate(30000)
             wf.writeframes(pcm)
         return path
 
@@ -29,7 +27,7 @@ class SpeechHandler:
                 speech_config=types.SpeechConfig(
                     voice_config=types.VoiceConfig(
                         prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                        voice_name=random.choice(VOICES),
+                            voice_name=random.choice(VOICES),
                         )
                     )
                 ),

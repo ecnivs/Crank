@@ -1,4 +1,5 @@
 import datetime
+from googleapiclient.http import ResumableUploadError
 from settings import *
 from google import genai
 from speech_handler import SpeechHandler
@@ -29,19 +30,35 @@ class Core:
         limit_time_dt = datetime.datetime.fromisoformat(limit_time)
         elapsed = datetime.datetime.now(datetime.UTC) - limit_time_dt
         hours = datetime.timedelta(hours = num_hours)
-        return int(max((hours - elapsed).total_seconds(), 0))
+        return int(max((hours - elapsed).total_seconds(), 10))
+
+    def _upload(self, content, output_path):
+        title = self.response_handler.gemini(f"{GET_TITLE}\n\n{content}", model = 1.5)
+        description = DESCRIPTION
+        try:
+            self.youtube_handler.upload(
+                video_path = output_path,
+                title = title,
+                tags = TAGS or [],
+                description = description,
+                categoryId = 20,
+            )
+        except ResumableUploadError:
+            self.state.set("limit_time", str(datetime.datetime.now(datetime.UTC).isoformat()))
+        current = self.state.get("used_content") or []
+        if title not in current:
+            current.append(title)
+            self.state.set("used_content", current[-100:])
 
     async def run(self):
         try:
             while True:
-                content = self.response_handler.gemini(query = CONTENT_PROMPT, model = 2.0)
+                content = self.response_handler.gemini(query = f"{CONTENT_PROMPT}\n\nAvoid ALL topics related to: {self.state.get('used_content') or []}\n\n Return ONLY fresh content.", model = 2.0)
                 media_path = self.media_handler.process(self.response_handler.gemini(f"{TERM_PROMPT}\n{content}", model=2.5))
                 audio_path = self.speech_handler.get_audio(transcript = content)
                 ass_path = self.caption_handler.get_captions(audio_path = audio_path)
                 output_path = self.video_editor.process_video(ass_path = ass_path, audio_path = audio_path, media_path = media_path)
-
-                logging.info(output_path)
-                await asyncio.sleep(1000)
+                self._upload(content, output_path)
 
                 time_left = self._time_left(num_hours = 24)
                 if time_left:

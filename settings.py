@@ -61,6 +61,21 @@ VOICES = [
 ]
 
 # -------------------------------
+# Video Configuration
+# -------------------------------
+DESCRIPTION = """
+#genshinimpact #genshinlore #teyvat #genshinshorts #genshinstory #lore #genshin #genshin_impact #genshinedit #genshinimpactedit #genshinimpactlore #genshinfandom 
+#genshinimpactgameplay #genshinshort #genshingameplay
+"""
+
+TAGS = [
+    "Genshin Impact", "Genshin Impact 2025", "miHoYo", "open world RPG", "action RPG",
+    "anime game", "Teyvat lore", "Genshin Impact characters", "Ganyu", "Zhongli",
+    "Venti", "Raiden Shogun", "elemental reactions", "gameplay", "guide",
+    "tips and tricks", "montage", "cinematic", "story walkthrough", "new update"
+]
+
+# -------------------------------
 # Prompt Configuration
 # -------------------------------
 CONTENT_PROMPT = """
@@ -68,7 +83,7 @@ Create a YouTube SHORT transcript about Genshin Impact LORE focusing on "[TOPIC]
 
 LORE CONTENT TYPES TO COVER:
 - Character backstories and hidden secrets
-- Regional lore and geography mysteries  
+- Regional lore and geography mysteries
 - Artifact lore and their dark histories
 - Weapon backstories and tragic origins
 - Archon secrets and divine conflicts
@@ -114,18 +129,22 @@ Generate a complete lore-focused transcript following the "Say [tone]:" format t
 Return only the transcript.
 """
 
+GET_TITLE = """
+Given the following YouTube video content, generate a catchy, concise, and SEO-optimized title that would maximize clicks and accurately reflect the core idea of the video.
+- Keep it under 5 words.
+- No clickbait or exaggeration.
+- No formatting.
+- Output only the title: no filler, no commentary, no reactions.
+- Avoid terms that may violate YouTube's community guidelines such as 'suicide', 'violence', 'abuse', or any other harmful or sensitive terms.
+"""
+
 TERM_PROMPT = """
-Find a YouTube video search term for a Genshin Impact cinematic that matches the content:
+Given the content below, identify the main subject discussed.
 
-The search term is the topic of discussion in a single word or two.
-Example - Eula
+- The subject will always be an entity from Genshin Impact.
+- Return ONLY a single word or short phrase representing that subject.
+- Do NOT include any explanation, punctuation, quotes, or extra text.
+- Examples: Eula, Inazuma, Ganyu, Skyward Blade
 
-Response Format:
-Return ONLY a single short search term, nothing else. Example:
-'Inazuma'
-
-Fallback Rule:
-If no video perfectly matches, return the closest / generic clean, high-quality Genshin Impact search term.
-
-Content to match visually:
+Content to analyze:
 """
