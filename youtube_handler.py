@@ -7,8 +7,6 @@ from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, ResumableUploadError
 from pathlib import Path
 
-# TODO: Implement email verification
-
 class YoutubeHandler:
     def __init__(self):
         self.secrets_file = Path("secrets.json")
