@@ -61,9 +61,8 @@ class Core:
                 self._upload(content, output_path)
 
                 time_left = self._time_left(num_hours = 24)
-                if time_left:
-                    logging.info(f"[{self.__class__.__name__}] Crank will continue in {time_left} secs")
-                    await asyncio.sleep(time_left)
+                logging.info(f"[{self.__class__.__name__}] Crank will continue in {time_left} secs")
+                await asyncio.sleep(time_left)
 
         except RuntimeError as e:
             logging.critical(e)
