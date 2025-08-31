@@ -53,16 +53,16 @@ class Core:
     async def run(self):
         try:
             while True:
+                time_left = self._time_left(num_hours = 24)
+                logging.info(f"[{self.__class__.__name__}] Crank will continue in {time_left//3600}h {(time_left%3600)//60}m {time_left%60}s")
+                await asyncio.sleep(time_left)
+
                 content = self.response_handler.gemini(query = f"{CONTENT_PROMPT}\n\nAvoid ALL topics related to: {self.state.get('used_content') or []}\n\n Return ONLY fresh content.", model = 2.0)
                 media_path = self.media_handler.process(self.response_handler.gemini(f"{TERM_PROMPT}\n{content}", model=2.5))
                 audio_path = self.speech_handler.get_audio(transcript = content)
                 ass_path = self.caption_handler.get_captions(audio_path = audio_path)
                 output_path = self.video_editor.process_video(ass_path = ass_path, audio_path = audio_path, media_path = media_path)
                 self._upload(content, output_path)
-
-                time_left = self._time_left(num_hours = 24)
-                logging.info(f"[{self.__class__.__name__}] Crank will continue in {time_left} secs")
-                await asyncio.sleep(time_left)
 
         except RuntimeError as e:
             logging.critical(e)
