@@ -43,7 +43,7 @@ class Core:
         self.workspace = workspace
         self.config = ConfigHandler(path)
         self.media_handler = MediaHandler(workspace = self.workspace)
-        self.video_editor = VideoEditor(workspace = self.workspace)
+        self.video_editor = VideoEditor()
         self.caption_handler = CaptionHandler(workspace = self.workspace, model_size = "tiny")
         self.speech_handler = SpeechHandler(client = self.client, workspace = self.workspace)
         self.response_handler = ResponseHandler(client = self.client)
@@ -91,9 +91,10 @@ class Core:
                 ass_path = self.caption_handler.get_captions(audio_path = audio_path)
                 output_path = self.video_editor.process_video(ass_path = ass_path, audio_path = audio_path, media_path = media_path)
 
-                if hasattr(self, "youtube_handler"):
-                    self._upload(content, output_path)
+                if not hasattr(self, "youtube_handler"):
+                    break
 
+                self._upload(content, output_path)
         except RuntimeError as e:
             self.logger.critical(e)
         except KeyboardInterrupt as e:

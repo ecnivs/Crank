@@ -11,9 +11,8 @@ logging.basicConfig(level=logging.DEBUG,
                     force=True)
 
 class VideoEditor:
-    def __init__(self, workspace):
+    def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.workspace = workspace
 
     def _get_duration(self, file_path):
         if not os.path.exists(file_path):
@@ -77,11 +76,12 @@ class VideoEditor:
             subprocess.run(cmd, check=True, capture_output=True, text=True)
             if not os.path.exists(output_path) or os.path.getsize(output_path) == 0:
                 raise RuntimeError(f"[{self.__class__.__name__}] Failed to generate output video (file is empty or doesn't exist)")
+            self.logger.info(f"Successfully generated output video to {output_path}")
             return output_path
 
         except subprocess.CalledProcessError as e:
             error_output = e.stderr if e.stderr else str(e)
-            logging.error(f"[{self.__class__.__name__}] FFmpeg command failed: {error_output}")
+            self.logger.error(f"FFmpeg command failed: {error_output}")
             raise RuntimeError(f"[{self.__class__.__name__}] Error while processing video: {error_output}")
 
         except Exception as e:
