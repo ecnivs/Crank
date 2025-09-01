@@ -1,4 +1,3 @@
-from settings import *
 from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
@@ -16,10 +15,11 @@ logging.basicConfig(level=logging.DEBUG,
                     force=True)
 
 class YoutubeHandler:
-    def __init__(self):
+    def __init__(self, name = "crank"):
+        self.name = name.replace(" ", "").lower()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.secrets_file = Path("secrets.json")
-        self.token_file = Path("token.json")
+        self.token_file = Path(f"{self.name}_token.json")
         self.scopes = ["https://www.googleapis.com/auth/youtube.upload"]
         self.credentials = None
         self.service = None

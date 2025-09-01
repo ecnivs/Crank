@@ -1,11 +1,10 @@
 import datetime
 from googleapiclient.http import ResumableUploadError
-from settings import *
 from google import genai
 from speech_handler import SpeechHandler
 from caption_handler import CaptionHandler
 from response_handler import ResponseHandler
-from state_handler import StateHandler
+from config_handler import ConfigHandler
 from youtube_handler import YoutubeHandler
 from media_handler import MediaHandler
 from video_editor import VideoEditor
@@ -15,6 +14,7 @@ import logging
 import shutil
 import tempfile
 from dotenv import load_dotenv
+from argparse import ArgumentParser
 
 load_dotenv()
 
@@ -37,20 +37,22 @@ def new_workspace():
         shutil.rmtree(temp_dir)
 
 class Core:
-    def __init__(self, workspace):
+    def __init__(self, workspace, path):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.client = genai.Client()
         self.workspace = workspace
-        self.state = StateHandler()
+        self.config = ConfigHandler(path)
         self.media_handler = MediaHandler(workspace = self.workspace)
         self.video_editor = VideoEditor(workspace = self.workspace)
-        self.youtube_handler = YoutubeHandler()
         self.caption_handler = CaptionHandler(workspace = self.workspace, model_size = "tiny")
         self.speech_handler = SpeechHandler(client = self.client, workspace = self.workspace)
         self.response_handler = ResponseHandler(client = self.client)
 
+        if self.config.get("UPLOAD") is not False:
+            self.youtube_handler = YoutubeHandler(self.config.get("NAME"))
+
     def _time_left(self, num_hours):
-        limit_time = self.state.get("limit_time")
+        limit_time = self.config.get("LIMIT_TIME")
         if not limit_time:
             return 0
         limit_time_dt = datetime.datetime.fromisoformat(limit_time)
@@ -59,22 +61,22 @@ class Core:
         return int(max((hours - elapsed).total_seconds(), 10))
 
     def _upload(self, content, output_path):
-        title = self.response_handler.gemini(f"{GET_TITLE}\n\n{content}", model = 1.5)
-        description = DESCRIPTION
+        title = self.response_handler.gemini(f"{self.config.get('GET_TITLE')}\n\n{content}", model = 1.5)
+        description = self.config.get("DESCRIPTION")
         try:
             self.youtube_handler.upload(
                 video_path = output_path,
                 title = title,
-                tags = TAGS or [],
+                tags = self.config.get("TAGS") or [],
                 description = description,
                 categoryId = 20,
             )
         except ResumableUploadError:
-            self.state.set("limit_time", str(datetime.datetime.now(datetime.UTC).isoformat()))
-        current = self.state.get("used_content") or []
+            self.config.set("LIMIT_TIME", str(datetime.datetime.now(datetime.UTC).isoformat()))
+        current = self.config.get("USED_CONTENT") or []
         if title not in current:
             current.append(title)
-            self.state.set("used_content", current[-100:])
+            self.config.set("USED_CONTENT", current[-100:])
 
     async def run(self):
         try:
@@ -83,12 +85,14 @@ class Core:
                 self.logger.info(f"Crank will continue in {time_left//3600}h {(time_left%3600)//60}m {time_left%60}s")
                 await asyncio.sleep(time_left)
 
-                content = self.response_handler.gemini(query = f"{CONTENT_PROMPT}\n\nAvoid ALL topics related to: {self.state.get('used_content') or []}\n\n Return ONLY fresh content.", model = 2.0)
-                media_path = self.media_handler.process(self.response_handler.gemini(f"{TERM_PROMPT}\n{content}", model=2.5))
+                content = self.response_handler.gemini(query = f"{self.config.get('CONTENT_PROMPT')}\n\nAvoid ALL topics related to: {self.config.get('USED_CONTENT') or []}\n\n Return ONLY fresh content.", model = 2.0)
+                media_path = self.media_handler.process(self.response_handler.gemini(f"{self.config.get('TERM_PROMPT')}\n{content}", model=2.5))
                 audio_path = self.speech_handler.get_audio(transcript = content)
                 ass_path = self.caption_handler.get_captions(audio_path = audio_path)
                 output_path = self.video_editor.process_video(ass_path = ass_path, audio_path = audio_path, media_path = media_path)
-                self._upload(content, output_path)
+
+                if hasattr(self, "youtube_handler"):
+                    self._upload(content, output_path)
 
         except RuntimeError as e:
             self.logger.critical(e)
@@ -98,6 +102,11 @@ class Core:
             self.logger.error(e)
 
 if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("--path", help = "Path to config.yml", default = "config.yml")
+    args = parser.parse_args()
+    path = args.path
+
     with new_workspace() as workspace:
-        core = Core(workspace)
+        core = Core(workspace, path)
         asyncio.run(core.run())

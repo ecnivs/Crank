@@ -1,9 +1,9 @@
 import yaml
 from pathlib import Path
 
-class StateHandler:
-    def __init__(self):
-        self.path = Path('state.yml')
+class ConfigHandler:
+    def __init__(self, path):
+        self.path = Path(path)
         self.state = self._load()
 
     def _load(self):

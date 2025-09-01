@@ -4,3 +4,4 @@ __pycache__/
 .env
 *.mp4
 .venv/
+!config.yml

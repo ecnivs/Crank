@@ -1,6 +1,5 @@
 import whisper
 import os
-from settings import *
 import logging
 
 # -------------------------------
