@@ -1,7 +1,9 @@
 # Crank
 > Youtube Shorts Generator
 
-![1000223934](https://github.com/user-attachments/assets/e8d5f7aa-f06e-403b-8dd1-59032875a25f)
+![IMG_20250901_182631](https://github.com/user-attachments/assets/2c272049-acc0-4b50-9b69-67c71cadf07e)
+
+
 
 ## Overview
 Automate the creation of YouTube Shorts with customizable prompts, titles, tags, and descriptions. Designed for fast, efficient content generation while giving you full control over the output.
