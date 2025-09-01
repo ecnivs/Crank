@@ -1,7 +1,6 @@
 import datetime
 from googleapiclient.http import ResumableUploadError
 from google import genai
-from speech_handler import SpeechHandler
 from caption_handler import CaptionHandler
 from response_handler import ResponseHandler
 from config_handler import ConfigHandler
@@ -14,6 +13,7 @@ import logging
 import shutil
 import tempfile
 from dotenv import load_dotenv
+from pathlib import Path
 from argparse import ArgumentParser
 
 load_dotenv()
@@ -40,13 +40,12 @@ class Core:
     def __init__(self, workspace, path):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.client = genai.Client()
-        self.workspace = workspace
+        self.workspace = Path(workspace)
         self.config = ConfigHandler(path)
         self.media_handler = MediaHandler(workspace = self.workspace)
         self.video_editor = VideoEditor()
         self.caption_handler = CaptionHandler(workspace = self.workspace, model_size = "tiny")
-        self.speech_handler = SpeechHandler(client = self.client, workspace = self.workspace)
-        self.response_handler = ResponseHandler(client = self.client)
+        self.response_handler = ResponseHandler(client = self.client, workspace = self.workspace)
 
         if self.config.get("UPLOAD") is not False:
             self.youtube_handler = YoutubeHandler(self.config.get("NAME"))
@@ -87,7 +86,7 @@ class Core:
 
                 content = self.response_handler.gemini(query = f"{self.config.get('CONTENT_PROMPT')}\n\nAvoid ALL topics related to: {self.config.get('USED_CONTENT') or []}\n\n Return ONLY fresh content.", model = 2.0)
                 media_path = self.media_handler.process(self.response_handler.gemini(f"{self.config.get('TERM_PROMPT')}\n{content}", model=2.5))
-                audio_path = self.speech_handler.get_audio(transcript = content)
+                audio_path = self.response_handler.get_audio(transcript = content)
                 ass_path = self.caption_handler.get_captions(audio_path = audio_path)
                 output_path = self.video_editor.process_video(ass_path = ass_path, audio_path = audio_path, media_path = media_path)
 

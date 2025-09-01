@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.DEBUG,
 
 class MediaHandler:
     def __init__(self, workspace):
-        self.workspace = Path(workspace)
+        self.workspace = workspace
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def _download_video(self, query, max_results=10):
@@ -47,7 +47,7 @@ class MediaHandler:
                 video_path = video_path.with_suffix(".mp4")
         return video_path
 
-    def _get_video_duration(self, path: Path):
+    def _get_video_duration(self, path):
         cmd = [
             "ffprobe",
             "-v", "error",
