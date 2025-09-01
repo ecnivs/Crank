@@ -75,7 +75,7 @@ python main.py --path path/to/your_config.yml
 If you find Crank helpful and want to support its development, donations are welcome!  
 Your support helps keep the project active and enables new features.
 <div align="center">
-<a href='https://ko-fi.com/U6U113P6OM' target='_blank'><img height='60' style='border:0px;width:217px;' src='https://storage.ko-fi.com/cdn/kofi3.png?v=6' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
+  <a href="https://www.buymeacoffee.com/ecnivs" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 60px !important;width: 217px !important;" ></a>
 </div>
 
 ## 🙌 Contributing
