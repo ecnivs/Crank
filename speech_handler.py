@@ -17,12 +17,36 @@ class SpeechHandler:
         self.client = client
         self.workspace = workspace
         self.voices = [
-            'Zephyr', 'Kore', 'Orus', 'Autonoe', 'Umbriel',
-            'Erinome', 'Laomedeia', 'Schedar', 'Achird', 'Sadachbia',
-            'Puck', 'Fenrir', 'Aoede', 'Enceladus', 'Algieba',
-            'Algenib', 'Achernar', 'Gacrux', 'Zubenelgenubi', 'Sadaltager',
-            'Charon', 'Leda', 'Callirrhoe', 'Iapetus', 'Despina',
-            'Rasalgethi', 'Alnilam', 'Pulcherrima', 'Vindemiatrix', 'Sulafat'
+            'Zephyr',
+            'Kore',
+            'Orus',
+            'Autonoe',
+            'Umbriel',
+            'Erinome',
+            'Laomedeia',
+            'Schedar',
+            'Achird',
+            'Sadachbia',
+            'Puck',
+            'Fenrir',
+            'Aoede',
+            'Enceladus',
+            'Algieba',
+            'Algenib',
+            'Achernar',
+            'Gacrux',
+            'Zubenelgenubi',
+            'Sadaltager',
+            'Charon',
+            'Leda',
+            'Callirrhoe',
+            'Iapetus',
+            'Despina',
+            'Rasalgethi',
+            'Alnilam',
+            'Pulcherrima',
+            'Vindemiatrix',
+            'Sulafat'
         ]
 
     def save_to_wav(self, pcm):
@@ -43,7 +67,7 @@ class SpeechHandler:
                 speech_config=types.SpeechConfig(
                     voice_config=types.VoiceConfig(
                         prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=random.choice(random.choice(self.voices)),
+                            voice_name=random.choice(self.voices),
                         )
                     )
                 ),

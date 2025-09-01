@@ -16,7 +16,6 @@ class MediaHandler:
         self.logger = logging.getLogger(self.__class__.__name__)
 
     def _download_video(self, query, max_results=10):
-        query = f"Genshin Impact cinematic {query}"
         ydl_opts_search = {
             "quiet": True,
             "extract_flat": True,

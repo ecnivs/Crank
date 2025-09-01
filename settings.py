@@ -1,6 +1,3 @@
-from dotenv import load_dotenv
-load_dotenv()
-
 # -------------------------------
 # Video Configuration
 # -------------------------------
@@ -86,6 +83,9 @@ Given the content below, identify the main subject discussed.
 - Return ONLY a single word or short phrase representing that subject.
 - Do NOT include any explanation, punctuation, quotes, or extra text.
 - Examples: Eula, Inazuma, Ganyu, Skyward Blade
+
+OUTPUT FORMAT REQUIREMENT:
+Genshin Impact Cinematic {Subject}
 
 Content to analyze:
 """
