@@ -80,9 +80,10 @@ class Core:
     async def run(self):
         try:
             while True:
-                time_left = self._time_left(num_hours = 24)
-                self.logger.info(f"Crank will continue in {time_left//3600}h {(time_left%3600)//60}m {time_left%60}s")
-                await asyncio.sleep(time_left)
+                if hasattr(self, "youtube_handler"):
+                    time_left = self._time_left(num_hours = 24)
+                    self.logger.info(f"Crank will continue in {time_left//3600}h {(time_left%3600)//60}m {time_left%60}s")
+                    await asyncio.sleep(time_left)
 
                 content = self.response_handler.gemini(query = f"{self.config.get('CONTENT_PROMPT')}\n\nAvoid ALL topics related to: {self.config.get('USED_CONTENT') or []}\n\n Return ONLY fresh content.", model = 2.0)
                 media_path = self.media_handler.process(self.response_handler.gemini(f"{self.config.get('TERM_PROMPT')}\n{content}", model=2.5))
