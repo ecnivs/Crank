@@ -4,7 +4,7 @@
 ![1000223934](https://github.com/user-attachments/assets/e8d5f7aa-f06e-403b-8dd1-59032875a25f)
 
 ## Overview
-This repo is dedicated to showcasing the automation of YouTube Shorts for my channel [Ask Irminsul](https://www.youtube.com/@askirminsul). It’s actively used and maintained to generate content efficiently.
+Automate the creation of YouTube Shorts with customizable prompts, titles, tags, and descriptions. Designed for fast, efficient content generation while giving you full control over the output.
 
 ## 🛠️ Prerequisites
 - Python 3.x (Tested with Python 3.13)
@@ -22,7 +22,19 @@ GEMINI_API_KEY=your_api_key_here
 The other credentials are stored as JSON files inside the root directory:
 - `secrets.json` — OAuth 2.0 client credentials JSON used for YouTube API upload authentication
 
-## ⚙️ Installation
+## ⚙️ Customization
+Crank is fully configurable. You can adjust prompts, descriptions, upload behavior, and other settings using your preffered method.
+
+#### Default settings in `config.yml`
+Change the following directly in the file:
+- `NAME`: the channel name
+- `UPLOAD`: `true` or `false` to enable/disable uploads
+- `DESCRIPTION`: default video description
+- `TAGS`: list of tags for each video
+- Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated.
+
+
+## 📦 Installation
 1. **Clone the repository**
 ```bash
 git clone https://github.com/ecnivs/crank.git
@@ -48,8 +60,13 @@ choco install ffmpeg  # windows
 ```
 
 ## 🚀 Runing Crank
+Run the tool with the default configuration:
 ```bash
 python main.py
+```
+Or provide your custom config file with `--path`:
+```bash
+python main.py --path path/to/your_config.yml
 ```
 
 ## 💖 Support the project
