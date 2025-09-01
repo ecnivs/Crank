@@ -3,9 +3,18 @@ from settings import *
 import wave
 import os
 import random
+import logging
+
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
 
 class SpeechHandler:
     def __init__(self, client, workspace):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.client = client
         self.workspace = workspace
 
@@ -35,5 +44,5 @@ class SpeechHandler:
         )
         data = response.candidates[0].content.parts[0].inline_data.data
         path = self.save_to_wav(data)
-        logging.info(f"[{self.__class__.__name__}] Audio saved to {path}")
+        self.logger.info(f"Audio saved to {path}")
         return path

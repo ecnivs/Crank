@@ -1,9 +1,18 @@
 import whisper
 import os
 from settings import *
+import logging
+
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
 
 class CaptionHandler:
     def __init__(self, workspace, model_size):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.model = whisper.load_model(model_size)
         self.workspace = workspace
         self.header = """[Script Info]
@@ -48,5 +57,5 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                     lines.append(" ".join(current_line))
                 formatted_text = "\\N".join(lines)
                 f.write(f"Dialogue: 0,{start},{end},Dynamic,,0,0,0,,{formatted_text}\n")
-        logging.info(f"[{self.__class__.__name__}] ASS file stored at {path}")
+        self.logger.info(f"ASS file stored at {path}")
         return path

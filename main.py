@@ -9,10 +9,33 @@ from state_handler import StateHandler
 from youtube_handler import YoutubeHandler
 from media_handler import MediaHandler
 from video_editor import VideoEditor
+from contextlib import contextmanager
 import asyncio
+import logging
+import shutil
+import tempfile
+
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
+
+# -------------------------------
+# Temporary Workspace
+# -------------------------------
+@contextmanager
+def new_workspace():
+    temp_dir = tempfile.mkdtemp()
+    try:
+        yield temp_dir
+    finally:
+        shutil.rmtree(temp_dir)
 
 class Core:
     def __init__(self, workspace):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.client = genai.Client()
         self.workspace = workspace
         self.state = StateHandler()
@@ -54,7 +77,7 @@ class Core:
         try:
             while True:
                 time_left = self._time_left(num_hours = 24)
-                logging.info(f"[{self.__class__.__name__}] Crank will continue in {time_left//3600}h {(time_left%3600)//60}m {time_left%60}s")
+                self.logger.info(f"Crank will continue in {time_left//3600}h {(time_left%3600)//60}m {time_left%60}s")
                 await asyncio.sleep(time_left)
 
                 content = self.response_handler.gemini(query = f"{CONTENT_PROMPT}\n\nAvoid ALL topics related to: {self.state.get('used_content') or []}\n\n Return ONLY fresh content.", model = 2.0)
@@ -65,11 +88,11 @@ class Core:
                 self._upload(content, output_path)
 
         except RuntimeError as e:
-            logging.critical(e)
+            self.logger.critical(e)
         except KeyboardInterrupt as e:
-            logging.info(f"[{self.__class__.__name__}] Shutting down...")
+            self.logger.info(f"Shutting down...")
         except Exception as e:
-            logging.error(e)
+            self.logger.error(e)
 
 if __name__ == "__main__":
     with new_workspace() as workspace:

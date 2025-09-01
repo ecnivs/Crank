@@ -1,28 +1,5 @@
-import logging
 from dotenv import load_dotenv
-from contextlib import contextmanager
-import shutil
-import tempfile
-
 load_dotenv()
-
-# -------------------------------
-# Temporary Workspace
-# -------------------------------
-@contextmanager
-def new_workspace():
-    temp_dir = tempfile.mkdtemp()
-    try:
-        yield temp_dir
-    finally:
-        shutil.rmtree(temp_dir)
-
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG, # Set logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-                    format='%(levelname)s - %(message)s', # Define log message format
-                    force=True) # Override existing logging settings
 
 # -------------------------------
 # Speech Configuration

@@ -3,9 +3,17 @@ import subprocess
 import logging
 import yt_dlp
 
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
+
 class MediaHandler:
     def __init__(self, workspace):
         self.workspace = Path(workspace)
+        self.logger = logging.getLogger(self.__class__.__name__)
 
     def _download_video(self, query, max_results=10):
         query = f"Genshin Impact cinematic {query}"
@@ -89,5 +97,5 @@ class MediaHandler:
         video_path = self._download_video(term)
         short_path = self._clip_video(video_path)
         video_path.unlink(missing_ok=True)
-        logging.info(f"[{self.__class__.__name__}] Video template stored at {short_path}")
+        self.logger.info(f"Video template stored at {short_path}")
         return short_path

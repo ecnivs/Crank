@@ -1,7 +1,16 @@
 from settings import *
+import logging
+
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
 
 class ResponseHandler:
     def __init__(self, client):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.client = client
         self.models = {
             "2.5": "gemini-2.5-flash",
@@ -15,5 +24,5 @@ class ResponseHandler:
             model = current_model,
             contents = query
         )
-        logging.info(f"[{self.__class__.__name__}] Gemini returned: {response.text}")
+        self.logger.info(f"Gemini returned: {response.text}")
         return response.text

@@ -3,8 +3,16 @@ import subprocess
 import json
 import logging
 
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
+
 class VideoEditor:
     def __init__(self, workspace):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.workspace = workspace
 
     def _get_duration(self, file_path):
@@ -77,5 +85,5 @@ class VideoEditor:
             raise RuntimeError(f"[{self.__class__.__name__}] Error while processing video: {error_output}")
 
         except Exception as e:
-            logging.error(f"[{self.__class__.__name__}] Unexpected error: {str(e)}")
+            self.logger.error(f"Unexpected error: {str(e)}")
             raise

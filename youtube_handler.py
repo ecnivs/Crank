@@ -6,9 +6,18 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, ResumableUploadError
 from pathlib import Path
+import logging
+
+# -------------------------------
+# Logging Configuration
+# -------------------------------
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(levelname)s - %(message)s',
+                    force=True)
 
 class YoutubeHandler:
     def __init__(self):
+        self.logger = logging.getLogger(self.__class__.__name__)
         self.secrets_file = Path("secrets.json")
         self.token_file = Path("token.json")
         self.scopes = ["https://www.googleapis.com/auth/youtube.upload"]
@@ -20,7 +29,7 @@ class YoutubeHandler:
         try:
             self._try_authenticate()
         except RefreshError:
-            logging.error(f"[{self.__class__.__name__}] Refresh failed. Deleting token and retrying.")
+            self.logger.error("Refresh failed. Deleting token and retrying.")
             if self.token_file.exists():
                 self.token_file.unlink()
             self.credentials = None
@@ -67,9 +76,9 @@ class YoutubeHandler:
                 media_body=media
             )
             response = request.execute()
-            logging.info(f"[{self.__class__.__name__}] Uploaded successfully. Video ID: {response['id']}")
+            self.logger.info(f"Uploaded successfully. Video ID: {response['id']}")
             return response['id']
         except ResumableUploadError:
             raise
         except Exception as e:
-            logging.error(f"[{self.__class__.__name__}] Failed to upload: {e}")
+            self.logger.error(f"Failed to upload: {e}")
