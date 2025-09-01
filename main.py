@@ -75,7 +75,7 @@ class Core:
             self.config.set("LIMIT_TIME", str(datetime.datetime.now(datetime.UTC).isoformat()))
         current = self.config.get("USED_CONTENT") or []
         if title not in current:
-            current.append(title)
+            current.append(title.strip())
             self.config.set("USED_CONTENT", current[-100:])
 
     async def run(self):
