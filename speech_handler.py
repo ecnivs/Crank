@@ -1,5 +1,4 @@
 from google.genai import types
-from settings import *
 import wave
 import os
 import random
@@ -17,6 +16,14 @@ class SpeechHandler:
         self.logger = logging.getLogger(self.__class__.__name__)
         self.client = client
         self.workspace = workspace
+        self.voices = [
+            'Zephyr', 'Kore', 'Orus', 'Autonoe', 'Umbriel',
+            'Erinome', 'Laomedeia', 'Schedar', 'Achird', 'Sadachbia',
+            'Puck', 'Fenrir', 'Aoede', 'Enceladus', 'Algieba',
+            'Algenib', 'Achernar', 'Gacrux', 'Zubenelgenubi', 'Sadaltager',
+            'Charon', 'Leda', 'Callirrhoe', 'Iapetus', 'Despina',
+            'Rasalgethi', 'Alnilam', 'Pulcherrima', 'Vindemiatrix', 'Sulafat'
+        ]
 
     def save_to_wav(self, pcm):
         path = os.path.join(self.workspace, 'speech.wav')
@@ -36,7 +43,7 @@ class SpeechHandler:
                 speech_config=types.SpeechConfig(
                     voice_config=types.VoiceConfig(
                         prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=random.choice(VOICES),
+                            voice_name=random.choice(random.choice(self.voices)),
                         )
                     )
                 ),

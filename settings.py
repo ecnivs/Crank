@@ -2,42 +2,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # -------------------------------
-# Speech Configuration
-# -------------------------------
-VOICES = [
-    'Zephyr',
-    'Kore',
-    'Orus',
-    'Autonoe',
-    'Umbriel',
-    'Erinome',
-    'Laomedeia',
-    'Schedar',
-    'Achird',
-    'Sadachbia',
-    'Puck',
-    'Fenrir',
-    'Aoede',
-    'Enceladus',
-    'Algieba',
-    'Algenib',
-    'Achernar',
-    'Gacrux',
-    'Zubenelgenubi',
-    'Sadaltager',
-    'Charon',
-    'Leda',
-    'Callirrhoe',
-    'Iapetus',
-    'Despina',
-    'Rasalgethi',
-    'Alnilam',
-    'Pulcherrima',
-    'Vindemiatrix',
-    'Sulafat'
-]
-
-# -------------------------------
 # Video Configuration
 # -------------------------------
 DESCRIPTION = """

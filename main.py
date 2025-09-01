@@ -14,6 +14,9 @@ import asyncio
 import logging
 import shutil
 import tempfile
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # -------------------------------
 # Logging Configuration
