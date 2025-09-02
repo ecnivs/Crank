@@ -34,6 +34,7 @@ Change the following directly in the file:
 - `DELAY`: number of hours between uploads: `0` for instant upload, or any positive number to schedule the video that many hours later.
 - `DESCRIPTION`: default video description
 - `TAGS`: list of tags for each video
+- `GEMINI_API_KEY`: optional channel-specific API key (overrides .env if set)
 - Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated.
 
 ## 📦 Installation
