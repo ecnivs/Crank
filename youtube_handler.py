@@ -5,6 +5,7 @@ from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaFileUpload, ResumableUploadError
 from pathlib import Path
+import datetime
 import logging
 
 # -------------------------------
@@ -55,7 +56,7 @@ class YoutubeHandler:
 
         self.service = build('youtube', 'v3', credentials=self.credentials)
 
-    def upload(self, video_path, title, description, tags: list, categoryId):
+    def upload(self, video_path, title, description, tags, categoryId, delay):
         try:
             body = {
                 'snippet': {
@@ -68,6 +69,11 @@ class YoutubeHandler:
                     'privacyStatus': 'public'
                 }
             }
+
+            if delay:
+                publish_time = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours = delay)
+                body['status']['publishAt'] = publish_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+                body['status']['privacyStatus'] = 'private'
 
             media = MediaFileUpload(str(video_path), mimetype='video/*', resumable=True)
             request = self.service.videos().insert(
@@ -82,3 +88,4 @@ class YoutubeHandler:
             raise
         except Exception as e:
             self.logger.error(f"Failed to upload: {e}")
+            return None

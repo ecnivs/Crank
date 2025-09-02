@@ -46,6 +46,7 @@ class Core:
         self.video_editor = VideoEditor()
         self.caption_handler = CaptionHandler(workspace = self.workspace, model_size = "tiny")
         self.response_handler = ResponseHandler(client = self.client, workspace = self.workspace)
+        self.delay = 0
 
         if self.config.get("UPLOAD") is not False:
             self.youtube_handler = YoutubeHandler(self.config.get("NAME"))
@@ -69,6 +70,7 @@ class Core:
                 tags = self.config.get("TAGS") or [],
                 description = description,
                 categoryId = 20,
+                delay = self.delay
             )
         except ResumableUploadError:
             self.config.set("LIMIT_TIME", str(datetime.datetime.now(datetime.UTC).isoformat()))
@@ -94,7 +96,8 @@ class Core:
                 if not hasattr(self, "youtube_handler"):
                     break
 
-                self._upload(content, output_path)
+                self._upload(content = content, output_path = output_path)
+                self.delay = self.delay + self.config.get("DELAY", 0)
         except RuntimeError as e:
             self.logger.critical(e)
         except KeyboardInterrupt as e:
