@@ -10,6 +10,7 @@ from video_editor import VideoEditor
 from contextlib import contextmanager
 import asyncio
 import logging
+import os
 import shutil
 import tempfile
 from dotenv import load_dotenv
@@ -39,9 +40,9 @@ def new_workspace():
 class Core:
     def __init__(self, workspace, path):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.client = genai.Client()
-        self.workspace = Path(workspace)
         self.config = ConfigHandler(path)
+        self.client = genai.Client(api_key = (self.config.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")))
+        self.workspace = Path(workspace)
         self.media_handler = MediaHandler(workspace = self.workspace)
         self.video_editor = VideoEditor()
         self.caption_handler = CaptionHandler(workspace = self.workspace, model_size = "tiny")
