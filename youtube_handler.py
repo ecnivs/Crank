@@ -20,7 +20,9 @@ class YoutubeHandler:
         self.name = name.replace(" ", "").lower()
         self.logger = logging.getLogger(self.__class__.__name__)
         self.secrets_file = Path("secrets.json")
-        self.token_file = Path(f"{self.name}_token.json")
+        self.token_folder = Path("tokens")
+        self.token_folder.mkdir(exist_ok = True)
+        self.token_file = self.token_folder / f"{self.name}_token.json"
         self.scopes = ["https://www.googleapis.com/auth/youtube.upload"]
         self.credentials = None
         self.service = None
