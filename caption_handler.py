@@ -67,5 +67,5 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
                 formatted_text = "\\N".join(lines)
                 f.write(f"Dialogue: 0,{start},{end},Dynamic,,0,0,0,,{formatted_text}\n")
-        self.logger.info(f"ASS file stored at {path}")
+        self.logger.info(f"ASS saved to {path}")
         return path
