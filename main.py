@@ -59,20 +59,21 @@ class Core:
         limit_time_dt = datetime.datetime.fromisoformat(limit_time)
         elapsed = datetime.datetime.now(datetime.UTC) - limit_time_dt
         hours = datetime.timedelta(hours = num_hours)
-        return int(max((hours - elapsed).total_seconds(), 10))
+        return int(max((hours - elapsed).total_seconds(), 0))
 
     def _upload(self, content, output_path):
         title = self.response_handler.gemini(f"{self.config.get('GET_TITLE')}\n\n{content}", model = 1.5)
         description = self.config.get("DESCRIPTION")
         try:
-            self.youtube_handler.upload(
+            self.config.set("LAST_UPLOAD", self.youtube_handler.upload(
                 video_path = output_path,
                 title = title,
                 tags = self.config.get("TAGS") or [],
                 description = description,
                 categoryId = 20,
-                delay = self.delay
-            )
+                delay = self.delay,
+                last_upload = self.config.get("LAST_UPLOAD") or datetime.datetime.now(datetime.UTC)
+            ))
         except ResumableUploadError:
             self.config.set("LIMIT_TIME", str(datetime.datetime.now(datetime.UTC).isoformat()))
         current = self.config.get("USED_CONTENT") or []
@@ -99,7 +100,6 @@ class Core:
 
                 if not hasattr(self, "youtube_handler"):
                     break
-
                 self._upload(content = content, output_path = output_path)
                 self.delay = self.delay + self.config.get("DELAY", 0)
         except RuntimeError as e:

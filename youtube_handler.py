@@ -58,7 +58,7 @@ class YoutubeHandler:
 
         self.service = build('youtube', 'v3', credentials=self.credentials)
 
-    def upload(self, video_path, title, description, tags, categoryId, delay):
+    def upload(self, video_path, title, description, tags, categoryId, delay, last_upload):
         try:
             body = {
                 'snippet': {
@@ -72,9 +72,9 @@ class YoutubeHandler:
                 }
             }
 
+            scheduled_publish_time = last_upload + datetime.timedelta(hours = delay)
             if delay:
-                publish_time = datetime.datetime.now(datetime.UTC) + datetime.timedelta(hours = delay)
-                body['status']['publishAt'] = publish_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
+                body['status']['publishAt'] = scheduled_publish_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
                 body['status']['privacyStatus'] = 'private'
 
             media = MediaFileUpload(str(video_path), mimetype='video/*', resumable=True)
@@ -85,7 +85,7 @@ class YoutubeHandler:
             )
             response = request.execute()
             self.logger.info(f"Uploaded successfully. Video ID: {response['id']}")
-            return response['id']
+            return scheduled_publish_time or datetime.datetime.now(datetime.UTC)
         except ResumableUploadError:
             raise
         except Exception as e:
