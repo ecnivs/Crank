@@ -31,10 +31,10 @@ Crank is fully configurable. You can adjust prompts, descriptions, upload behavi
 Change the following directly in the file:
 - `NAME`: the channel name
 - `UPLOAD`: `true` or `false` to enable/disable uploads
+- `DELAY`: number of hours between uploads: `0` for instant upload, or any positive number to schedule the video that many hours later.
 - `DESCRIPTION`: default video description
 - `TAGS`: list of tags for each video
 - Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated.
-
 
 ## 📦 Installation
 1. **Clone the repository**
