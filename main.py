@@ -88,7 +88,7 @@ class Core:
                     time_left = self._time_left(num_hours = 24)
                     while time_left > 0:
                         hours, minutes, seconds = time_left // 3600, (time_left % 3600) // 60, time_left % 60
-                        print(f"\rCrank will continue in {hours}h {minutes}m {seconds}s", end="")
+                        print(f"\r[{self.config.get("NAME")}] Crank will continue in {hours}h {minutes}m {seconds}s", end="")
                         await asyncio.sleep(1)
                         time_left -= 1
 
