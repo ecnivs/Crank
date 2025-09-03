@@ -70,7 +70,7 @@ class Core:
                 title = title,
                 tags = self.config.get("TAGS") or [],
                 description = description,
-                categoryId = 20,
+                categoryId = self.config.get("CATEGORY_ID", default = 24),
                 delay = self.delay,
                 last_upload = self.config.get("LAST_UPLOAD") or datetime.datetime.now(datetime.UTC)
             ))
