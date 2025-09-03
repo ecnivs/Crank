@@ -101,7 +101,6 @@ class Core:
                 if not hasattr(self, "youtube_handler"):
                     break
                 self._upload(content = content, output_path = output_path)
-                self.delay = self.delay + self.config.get("DELAY", 0)
         except RuntimeError as e:
             self.logger.critical(e)
         except KeyboardInterrupt as e:
