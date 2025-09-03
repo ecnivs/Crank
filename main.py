@@ -47,7 +47,6 @@ class Core:
         self.video_editor = VideoEditor()
         self.caption_handler = CaptionHandler(workspace = self.workspace, model_size = "tiny")
         self.response_handler = ResponseHandler(client = self.client, workspace = self.workspace)
-        self.delay = 0
 
         if self.config.get("UPLOAD") is not False:
             self.youtube_handler = YoutubeHandler(self.config.get("NAME"))
@@ -71,7 +70,7 @@ class Core:
                 tags = self.config.get("TAGS") or [],
                 description = description,
                 categoryId = self.config.get("CATEGORY_ID", default = 24),
-                delay = self.delay,
+                delay = self.config.get("DELAY", 0),
                 last_upload = self.config.get("LAST_UPLOAD") or datetime.datetime.now(datetime.UTC)
             ))
         except ResumableUploadError:
