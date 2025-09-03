@@ -72,10 +72,15 @@ class YoutubeHandler:
                 }
             }
 
-            scheduled_publish_time = last_upload + datetime.timedelta(hours = delay)
-            if delay:
+            scheduled_publish_time = last_upload + datetime.timedelta(hours=delay)
+            now = datetime.datetime.now(datetime.UTC)
+
+            if delay and scheduled_publish_time > now:
                 body['status']['publishAt'] = scheduled_publish_time.strftime('%Y-%m-%dT%H:%M:%S.000Z')
                 body['status']['privacyStatus'] = 'private'
+            else:
+                body['status']['privacyStatus'] = 'public'
+                scheduled_publish_time = now
 
             media = MediaFileUpload(str(video_path), mimetype='video/*', resumable=True)
             request = self.service.videos().insert(
