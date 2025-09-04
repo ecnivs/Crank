@@ -76,20 +76,23 @@ class Core:
         except ResumableUploadError:
             self.config.set("LIMIT_TIME", str(datetime.datetime.now(datetime.UTC).isoformat()))
         current = self.config.get("USED_CONTENT") or []
-        if title not in current:
+        if title and title not in current:
             current.append(title.strip())
             self.config.set("USED_CONTENT", current[-100:])
 
+    async def timer(self, time_left):
+        while time_left > 0:
+            hours, minutes, seconds = time_left // 3600, (time_left % 3600) // 60, time_left % 60
+            print(f"\r[{self.config.get("NAME")}] Crank will continue in {hours}h {minutes}m {seconds}s", end="")
+            await asyncio.sleep(1)
+            time_left -= 1
+
     async def run(self):
-        try:
-            while True:
+        while True:
+            try:
                 if hasattr(self, "youtube_handler"):
                     time_left = self._time_left(num_hours = 24)
-                    while time_left > 0:
-                        hours, minutes, seconds = time_left // 3600, (time_left % 3600) // 60, time_left % 60
-                        print(f"\r[{self.config.get("NAME")}] Crank will continue in {hours}h {minutes}m {seconds}s", end="")
-                        await asyncio.sleep(1)
-                        time_left -= 1
+                    asyncio.run(self.timer(time_left))
 
                 content = self.response_handler.gemini(query = f"{self.config.get('CONTENT_PROMPT')}\n\nAvoid ALL topics related to: {self.config.get('USED_CONTENT') or []}\n\n Return ONLY fresh content.", model = 2.0)
                 media_path = self.media_handler.process(self.response_handler.gemini(f"{self.config.get('TERM_PROMPT')}\n{content}", model=2.5))
@@ -99,13 +102,16 @@ class Core:
 
                 if not hasattr(self, "youtube_handler"):
                     break
+
                 self._upload(content = content, output_path = output_path)
-        except RuntimeError as e:
-            self.logger.critical(e)
-        except KeyboardInterrupt as e:
-            self.logger.info(f"Shutting down...")
-        except Exception as e:
-            self.logger.error(e)
+            except RuntimeError as e:
+                self.logger.critical(e)
+                break
+            except KeyboardInterrupt as e:
+                self.logger.info(f"Shutting down...")
+                break
+            except Exception as e:
+                self.logger.error(e)
 
 if __name__ == "__main__":
     parser = ArgumentParser()

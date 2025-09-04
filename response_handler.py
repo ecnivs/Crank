@@ -120,5 +120,4 @@ class ResponseHandler:
 
             self.logger.warning(f"Model {fallback_model} exhausted retries, trying fallback if available")
 
-        self.logger.error("All Gemini models failed after retries and fallbacks")
-        return None
+        raise Exception("All Gemini models failed after retries and fallbacks")

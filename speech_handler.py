@@ -59,21 +59,37 @@ class SpeechHandler:
         return path
 
     def get_audio(self, transcript):
-        response = self.client.models.generate_content(
-            model="gemini-2.5-flash-preview-tts",
-            contents=transcript,
-            config=types.GenerateContentConfig(
-                response_modalities=["AUDIO"],
-                speech_config=types.SpeechConfig(
-                    voice_config=types.VoiceConfig(
-                        prebuilt_voice_config=types.PrebuiltVoiceConfig(
-                            voice_name=random.choice(self.voices),
+        try:
+            if not transcript:
+                raise ValueError("Transcript must be a non-empty string")
+
+            response = self.client.models.generate_content(
+                model="gemini-2.5-flash-preview-tts",
+                contents=transcript,
+                config=types.GenerateContentConfig(
+                    response_modalities=["AUDIO"],
+                    speech_config=types.SpeechConfig(
+                        voice_config=types.VoiceConfig(
+                            prebuilt_voice_config=types.PrebuiltVoiceConfig(
+                                voice_name=random.choice(self.voices),
+                            )
                         )
-                    )
-                ),
+                    ),
+                )
             )
-        )
-        data = response.candidates[0].content.parts[0].inline_data.data
-        path = self.save_to_wav(data)
-        self.logger.info(f"Audio saved to {path}")
-        return path
+
+            if not response.candidates:
+                raise ValueError("No candidates returned from TTS model")
+            if not response.candidates[0].content.parts:
+                raise ValueError("No content parts returned in response")
+
+            data = response.candidates[0].content.parts[0].inline_data.data
+            if not data:
+                raise ValueError("No audio data found in response")
+
+            path = self.save_to_wav(data)
+            self.logger.info(f"Audio saved to {path}")
+            return path
+
+        except Exception as e:
+            raise Exception(f"Failed to generate audio: {e}")
