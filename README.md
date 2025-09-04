@@ -1,12 +1,20 @@
 <h1 align="center">Crank</h1>
-<p align="center">Youtube Shorts Generator</p>
+<p align="center"><em>Youtube Shorts Generator</em></p>
 
 ![IMG_20250901_182631](https://github.com/user-attachments/assets/2c272049-acc0-4b50-9b69-67c71cadf07e)
 
 <p align="center">
-  <a href="https://github.com/ecnivs/crank/stargazers"><img src="https://img.shields.io/github/stars/ecnivs/crank?style=flat-square"></a>
-  <a href="https://github.com/ecnivs/crank/issues"><img src="https://img.shields.io/github/issues/ecnivs/crank?style=flat-square"></a>
-  <a href="https://github.com/ecnivs/crank/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-Custom-blue?style=flat-square"></a>
+  <a href="https://github.com/ecnivs/crank/stargazers">
+    <img src="https://img.shields.io/github/stars/ecnivs/crank?style=flat-square">
+  </a>
+  <a href="https://github.com/ecnivs/crank/issues">
+    <img src="https://img.shields.io/github/issues/ecnivs/crank?style=flat-square">
+  </a>
+  <a href="https://github.com/ecnivs/crank/blob/master/LICENSE">
+    <img src="https://img.shields.io/badge/license-Custom-blue?style=flat-square">
+  </a>
+  <img src="https://img.shields.io/badge/python-3.13%2B-blue?style=flat-square">
+  <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-informational?style=flat-square">
 </p>
 
 ## Overview
