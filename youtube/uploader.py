@@ -15,7 +15,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(message)s',
                     force=True)
 
-class YoutubeHandler:
+class Uploader:
     def __init__(self, name = "crank"):
         self.name = name.replace(" ", "").lower()
         self.logger = logging.getLogger(self.__class__.__name__)

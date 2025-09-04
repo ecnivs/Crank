@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(message)s',
                     force=True)
 
-class CaptionHandler:
+class AudioProcessor:
     def __init__(self, workspace, model_size):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.model = whisper.load_model(model_size)

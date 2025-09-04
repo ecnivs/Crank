@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(message)s',
                     force=True)
 
-class MediaHandler:
+class Scraper:
     def __init__(self, workspace):
         self.workspace = workspace
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -92,7 +92,7 @@ class MediaHandler:
         subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         return output_path
 
-    def process(self, term):
+    def get_media(self, term):
         video_path = self._download_video(term)
         short_path = self._clip_video(video_path)
         video_path.unlink(missing_ok=True)

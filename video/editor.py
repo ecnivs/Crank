@@ -10,7 +10,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(message)s',
                     force=True)
 
-class VideoEditor:
+class Editor:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
 
@@ -37,7 +37,7 @@ class VideoEditor:
         except json.JSONDecodeError:
             raise RuntimeError(f"[{self.__class__.__name__}] Failed to parse FFprobe output for {file_path}")
 
-    def process_video(self, ass_path, audio_path, media_path):
+    def assemble(self, ass_path, audio_path, media_path):
         output_path = 'output.mp4'
         for file_path, file_desc in [
             (ass_path, "ASS subtitle file"),

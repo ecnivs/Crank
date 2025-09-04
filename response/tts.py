@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(message)s',
                     force=True)
 
-class SpeechHandler:
+class TextToSpeech:
     def __init__(self, client, workspace):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.client = client
