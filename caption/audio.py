@@ -1,5 +1,4 @@
 import whisper
-import os
 import logging
 import spacy
 
@@ -38,7 +37,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 
     def get_captions(self, audio_path):
         result = self.model.transcribe(audio_path)
-        path = os.path.join(self.workspace, 'captions.ass')
+        path = self.workspace / 'captions.ass'
         with open(path, "w", encoding="utf-8") as f:
             f.write(self.header)
             for segment in result.get("segments", []):
