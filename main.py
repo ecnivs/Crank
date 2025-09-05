@@ -65,7 +65,7 @@ class Core:
         title = self.gemini.get_response(f"{self.preset.get('GET_TITLE')}\n\n{content}", model = 1.5)
         description = self.preset.get("DESCRIPTION")
         try:
-            self.preset.set("LAST_UPLOAD", self.youtube_handler.upload(
+            self.preset.set("LAST_UPLOAD", self.uploader.upload(
                 video_path = output_path,
                 title = title,
                 tags = self.preset.get("TAGS") or [],
