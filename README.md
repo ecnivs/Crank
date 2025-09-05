@@ -13,7 +13,7 @@
   <a href="https://github.com/ecnivs/crank/blob/master/LICENSE">
     <img src="https://img.shields.io/badge/license-Custom-blue?style=flat-square">
   </a>
-  <img src="https://img.shields.io/badge/python-3.13%2B-blue?style=flat-square">
+  <img src="https://img.shields.io/github/languages/top/ecnivs/crank?style=flat-square">
   <img src="https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-informational?style=flat-square">
 </p>
 
