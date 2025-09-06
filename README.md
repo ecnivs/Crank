@@ -48,7 +48,7 @@ Change the following directly in the file:
 - `TAGS`: list of tags for each video
 - `CATEGORY_ID`: defines video category (defaults to 24)
 - `GEMINI_API_KEY`: optional channel-specific API key (overrides .env if set)
-- `WHISPER_MODEL`: preferred whisper model (tiny, base, small, medium, large-v1, large-v2, large-v3)
+- `WHISPER_MODEL`: preferred whisper model (tiny, base, small, medium, large-v1, large-v2, large-v3; defaults to small)
 - Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated.
 
 ## 📦 Installation
