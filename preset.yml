@@ -1,0 +1,103 @@
+# -------------------------------
+# Channel Configuration
+# -------------------------------
+NAME: "My Shorts Channel"
+
+WHISPER_MODEL: "small"
+
+UPLOAD: false
+
+DELAY: 0
+
+DESCRIPTION: |
+  #shorts #gaming #lore #story #cinematic #edit #fandom #viralshorts #trending
+
+TAGS:
+  - "Shorts"
+  - "Viral 2025"
+  - "Storytelling"
+  - "Gaming"
+  - "Lore"
+  - "Characters"
+  - "Secrets"
+  - "Tips and Tricks"
+  - "Cinematic"
+  - "Guide"
+  - "Walkthrough"
+  - "New Update"
+
+# -------------------------------
+# Prompt Configuration
+# -------------------------------
+CONTENT_PROMPT: |
+  Create a YouTube SHORT transcript about [TOPIC].
+
+  CONTENT TYPES TO COVER:
+  - Character or subject backstories
+  - Hidden secrets and mysteries
+  - Object or artifact histories
+  - Conflicts and rivalries
+  - Ancient civilizations and legends
+  - Surprising connections and theories
+  - Environmental storytelling details
+  - Lesser-known facts that most people miss
+  - Real-world inspirations or parallels
+  - Shocking twists, revelations, or tragedies
+
+  FORMAT REQUIREMENT:
+  Write EXACTLY like this example format:
+  "Say enthusiastically: Did you know [Subject] has a shocking secret?
+  Say mysteriously: But here's the detail most people miss.
+  Say excitedly: It changes everything we thought we knew!"
+
+  TRANSCRIPT STRUCTURE:
+  - 3-5 short sentences maximum (60 second limit)
+  - Each sentence starts with "Say [tone/emotion]:" followed by the content
+  - Use different tones for each sentence to create dynamic delivery
+  - End with an engagement prompt about the content
+
+  TONE OPTIONS:
+  - Say mysteriously: (for secrets and hidden lore)
+  - Say dramatically: (for tragic backstories)
+  - Say ominously: (for dark truths)
+  - Say excitedly: (for surprising discoveries)
+  - Say conspiratorially: (for theories and connections)
+  - Say sadly: (for tragedies)
+  - Say amazed: (for incredible revelations)
+  - Say eerily: (for creepy details)
+
+  CONTENT-SPECIFIC REQUIREMENTS:
+  - Reference specific details (events, quotes, sources)
+  - Include names, locations, and events accurately
+  - Reveal facts most viewers miss
+  - Connect different parts of the subject's history
+  - Build to a shocking revelation or hidden truth
+  - End with an engagement prompt ("Did you know this?" "What’s your favorite theory?")
+
+  Generate a complete transcript following the "Say [tone]:" format.
+  Return only the transcript.
+
+GET_TITLE: |
+  Given the following YouTube video content, generate a catchy, concise, and SEO-optimized title that would maximize clicks and accurately reflect the core idea of the video.
+  - Keep it under 5 words.
+  - No clickbait or exaggeration.
+  - No formatting.
+  - Output only the title: no filler, no commentary, no reactions.
+  - Avoid sensitive terms that violate YouTube community guidelines.
+
+TERM_PROMPT: |
+  Given the content below, identify the main subject discussed.
+
+  - The subject will always be a single entity (character, place, object, concept).
+  - Return ONLY a single word or short phrase representing that subject.
+  - Do NOT include any explanation, punctuation, quotes, or extra text.
+  - Examples: Atlantis, Excalibur, Naruto, Ancient Rome
+
+  OUTPUT FORMAT REQUIREMENT:
+  Cinematic {Subject}
+
+  Content to analyze:
+
+# -------------------------------
+# State Configuration
+# -------------------------------
