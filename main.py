@@ -76,6 +76,8 @@ class Core:
             ))
         except ResumableUploadError:
             self.preset.set("LIMIT_TIME", str(datetime.datetime.now(datetime.UTC).isoformat()))
+            self.logger.warning("Upload limit reached")
+
         current = self.preset.get("USED_CONTENT") or []
         if title and title not in current:
             current.append(title.strip())
@@ -84,7 +86,7 @@ class Core:
     async def run(self):
         while True:
             try:
-                if hasattr(self, "youtube_handler"):
+                if hasattr(self, "uploader"):
                     time_left = self._time_left(num_hours = 24)
                     while time_left > 0:
                         hours, minutes, seconds = time_left // 3600, (time_left % 3600) // 60, time_left % 60
