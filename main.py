@@ -45,7 +45,7 @@ class Core:
         self.workspace = Path(workspace)
         self.scraper = Scraper(workspace = self.workspace)
         self.video = Editor()
-        self.audio_processor = AudioProcessor(workspace = self.workspace, model_size = "tiny")
+        self.audio_processor = AudioProcessor(workspace = self.workspace, model_size = self.preset.get("WHISPER_MODEL", default = "small"))
         self.tts = TextToSpeech(client = self.client, workspace = self.workspace)
         self.gemini = Gemini(client = self.client, workspace = self.workspace)
 
@@ -62,13 +62,13 @@ class Core:
         return int(max((hours - elapsed).total_seconds(), 0))
 
     def _upload(self, content, output_path):
-        title = self.gemini.get_response(f"{self.preset.get('GET_TITLE')}\n\n{content}", model = 1.5)
-        description = self.preset.get("DESCRIPTION")
+        title = self.gemini.get_response(f"{self.preset.get('GET_TITLE')}\n\n{content}", model = 1.5) or "#shorts"
+        description = self.preset.get("DESCRIPTION", default = "#shorts")
         try:
             self.preset.set("LAST_UPLOAD", self.uploader.upload(
                 video_path = output_path,
                 title = title,
-                tags = self.preset.get("TAGS") or [],
+                tags = self.preset.get("TAGS", default = []),
                 description = description,
                 categoryId = self.preset.get("CATEGORY_ID", default = 24),
                 delay = self.preset.get("DELAY", 0),
@@ -113,7 +113,7 @@ class Core:
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("--path", help = "Path to config.yml", default = "config.yml")
+    parser.add_argument("--path", help = "Path to config.yml", default = "preset.yml")
     args = parser.parse_args()
     path = args.path
 

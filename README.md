@@ -39,7 +39,7 @@ The other credentials are stored as JSON files inside the root directory:
 ## ⚙️ Customization
 Crank is fully configurable. You can adjust prompts, descriptions, upload behavior, and other settings using your preffered method.
 
-#### Default settings in `config.yml`
+#### Default settings in `preset.yml`
 Change the following directly in the file:
 - `NAME`: the channel name
 - `UPLOAD`: `true` or `false` to enable/disable uploads
@@ -48,6 +48,7 @@ Change the following directly in the file:
 - `TAGS`: list of tags for each video
 - `CATEGORY_ID`: defines video category (defaults to 24)
 - `GEMINI_API_KEY`: optional channel-specific API key (overrides .env if set)
+- `WHISPER_MODEL`: preferred whisper model (tiny, base, small, medium, large-v1, large-v2, large-v3)
 - Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated.
 
 ## 📦 Installation
