@@ -92,7 +92,7 @@ class Core:
                         await asyncio.sleep(1)
                         time_left -= 1
 
-                content = self.gemini.get_response(query = f"{self.preset.get('CONTENT_PROMPT')}\n\nAvoid ALL topics related to: {self.preset.get('USED_CONTENT') or []}\n\n Return ONLY fresh content.", model = 2.0)
+                content = self.gemini.get_response(query = f"{self.preset.get('CONTENT_PROMPT')}\n\nAvoid ALL topics even remotely related to: {self.preset.get('USED_CONTENT') or []}\n\n Return ONLY fresh content.", model = 2.0)
                 media_path = self.scraper.get_media(self.gemini.get_response(f"{self.preset.get('TERM_PROMPT')}\n{content}", model=2.5))
                 audio_path = self.tts.get_audio(transcript = content)
                 ass_path = self.audio_processor.get_captions(audio_path = audio_path)
