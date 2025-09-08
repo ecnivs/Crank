@@ -10,18 +10,19 @@ logging.basicConfig(level=logging.DEBUG,
                     force=True)
 
 class AudioProcessor:
-    def __init__(self, workspace, model_size):
+    def __init__(self, workspace, model_size, font):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.model = whisper.load_model(model_size)
         self.workspace = workspace
+        self.font = font
         self.nlp = spacy.load("en_core_web_md", disable=["ner", "lemmatizer"])
-        self.header = """[Script Info]
+        self.header = f"""[Script Info]
 ScriptType: v4.00+
 PlayResX: 1920
 PlayResY: 1080
 [V4+ Styles]
 Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
-Style: Dynamic, Comic Sans MS, 48, &H00FFFFFF, &H000000FF, &H00000000, &H80000000, 1, 0, 0, 0, 100, 100, 0, 0, 1, 2, 0, 5, 50, 50, 20, 1
+Style: Dynamic, {self.font}, 48, &H00FFFFFF, &H000000FF, &H00000000, &H80000000, 1, 0, 0, 0, 100, 100, 0, 0, 1, 2, 0, 5, 50, 50, 20, 1
 [Events]
 Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 """
@@ -72,7 +73,7 @@ Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
                         chunk_size = 1
                         total_chars = len(current_word)
 
-                        for j in range(i + 1, min(i + 3, len(words_data))):
+                        for j in range(i + 1, min(i + 2, len(words_data))):
                             next_word = words_data[j]["word"].strip()
                             if total_chars + len(next_word) + 1 > 20:
                                 break

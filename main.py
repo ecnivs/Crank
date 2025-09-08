@@ -44,13 +44,15 @@ class Core:
         self.client = genai.Client(api_key = (self.preset.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY")))
         self.workspace = Path(workspace)
         self.scraper = Scraper(workspace = self.workspace)
-        self.video = Editor()
-        self.audio_processor = AudioProcessor(workspace = self.workspace, model_size = self.preset.get("WHISPER_MODEL", default = "small"))
+        self.video = Editor(self.workspace)
         self.tts = TextToSpeech(client = self.client, workspace = self.workspace)
         self.gemini = Gemini(client = self.client, workspace = self.workspace)
+        self.audio_processor = AudioProcessor(workspace = self.workspace,
+                                              model_size = self.preset.get("WHISPER_MODEL", default = "small"),
+                                              font = self.preset.get("FONT", default = "Comic Sans MS"))
 
         if self.preset.get("UPLOAD") is not False:
-            self.uploader = Uploader(self.preset.get("NAME", default = "crank"))
+            self.uploader = Uploader(name = self.preset.get("NAME", default = "crank"), auth_token = self.preset.get("OAUTH_PATH", "secrets.json"))
 
     def _time_left(self, num_hours):
         limit_time = self.preset.get("LIMIT_TIME")

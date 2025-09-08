@@ -16,10 +16,10 @@ logging.basicConfig(level=logging.DEBUG,
                     force=True)
 
 class Uploader:
-    def __init__(self, name = "crank"):
+    def __init__(self, name = "crank", auth_token = "secrets.json"):
         self.name = name.replace(" ", "").lower()
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.secrets_file = Path("secrets.json")
+        self.secrets_file = auth_token
         self.token_folder = Path("tokens")
         self.token_folder.mkdir(exist_ok = True)
         self.token_file = self.token_folder / f"{self.name}_token.json"
@@ -89,7 +89,7 @@ class Uploader:
                 media_body=media
             )
             response = request.execute()
-            self.logger.info(f"Uploaded successfully. Video ID: {response['id']}")
+            self.logger.info(f"Uploaded successfully: https://www.youtube.com/watch?v={response['id']}")
             return scheduled_publish_time or datetime.datetime.now(datetime.UTC)
         except ResumableUploadError:
             raise

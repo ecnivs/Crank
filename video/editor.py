@@ -11,8 +11,9 @@ logging.basicConfig(level=logging.DEBUG,
                     force=True)
 
 class Editor:
-    def __init__(self):
+    def __init__(self, workspace):
         self.logger = logging.getLogger(self.__class__.__name__)
+        self.workspace = workspace
 
     def _get_duration(self, file_path):
         if not os.path.exists(file_path):
@@ -38,7 +39,7 @@ class Editor:
             raise RuntimeError(f"[{self.__class__.__name__}] Failed to parse FFprobe output for {file_path}")
 
     def assemble(self, ass_path, audio_path, media_path):
-        output_path = 'output.mp4'
+        output_path = self.workspace / 'output.mp4'
         for file_path, file_desc in [
             (ass_path, "ASS subtitle file"),
             (audio_path, "Audio file"), 
