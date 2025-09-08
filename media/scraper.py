@@ -38,7 +38,7 @@ class Scraper:
         output_template = str(self.workspace / "%(id)s.%(ext)s")
         ydl_opts_download = {
             "outtmpl": output_template,
-            "format": "worst[ext=mp4]/worst",
+            "format": "worst[ext=mp4]",
         }
         with yt_dlp.YoutubeDL(ydl_opts_download) as ydl:
             info = ydl.extract_info(url, download=True)
@@ -61,6 +61,12 @@ class Scraper:
     def _clip_video(self, input_path):
         duration = self._get_video_duration(input_path)
         output_path = self.workspace / f"{input_path.stem}_short.mp4"
+
+        vf_filters = (
+            "crop=ih*9/16:ih,scale=1080:1920,gblur=sigma=5,"
+            "hflip"
+        )
+
         if duration >= 60:
             start_time = max(0, (duration / 2) - 30)
             cmd = [
@@ -68,7 +74,7 @@ class Scraper:
                 "-ss", str(start_time),
                 "-i", str(input_path),
                 "-t", "60",
-                "-vf", "crop=ih*9/16:ih,scale=1080:1920,gblur=sigma=5",
+                "-vf", vf_filters,
                 "-c:v", "libx264",
                 "-preset", "fast",
                 "-crf", "23",
@@ -82,7 +88,7 @@ class Scraper:
                 "-stream_loop", str(loops),
                 "-i", str(input_path),
                 "-t", "60",
-                "-vf", "crop=ih*9/16:ih,scale=1080:1920,gblur=sigma=5",
+                "-vf", vf_filters,
                 "-c:v", "libx264",
                 "-preset", "fast",
                 "-crf", "23",

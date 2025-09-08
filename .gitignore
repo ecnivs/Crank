@@ -3,6 +3,7 @@ __pycache__/
 *.yml
 .env
 *.mp4
+!example.mp4
 .venv/
 !preset.yml
 configs/
