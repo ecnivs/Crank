@@ -37,13 +37,13 @@ The other credentials are stored as JSON files inside the root directory:
 - `secrets.json` — OAuth 2.0 client credentials JSON used for YouTube API upload authentication
 
 ## ⚙️ Customization
-Crank is fully configurable. You can adjust prompts, descriptions, upload behavior, and other settings using your preffered method.
+Crank is fully configurable. You can adjust prompts, descriptions, upload behavior, and other settings using your preferred method.
 
 #### Default settings in `preset.yml`
 Change the following directly in the file:
 - `NAME`: the channel name
 - `UPLOAD`: `true` or `false` to enable/disable uploads
-- `DELAY`: number of hours between uploads: `0` for instant upload, or any positive number to schedule the video that many hours later.
+- `DELAY`: number of hours between uploads: `0` for instant upload, or any positive number to schedule the video that many hours later (defaults to `2.5`)
 - `DESCRIPTION`: default video description
 - `TAGS`: list of tags for each video
 - `CATEGORY_ID`: defines video category (defaults to `24`)
@@ -51,7 +51,7 @@ Change the following directly in the file:
 - `OAUTH_PATH`: path to OAuth credentials (defaults to `secrets.json`)
 - `GEMINI_API_KEY`: optional channel-specific API key (overrides .env if set)
 - `WHISPER_MODEL`: preferred whisper model (`tiny`, `base`, `small`, `medium`, `large-v1`, `large-v2`, `large-v3`; defaults to `small`)
-- Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated.
+- Prompt configurations (`CONTENT_PROMPT`, `GET_TITLE`, `TERM_PROMPT`): control how transcripts, titles, and subjects are generated
 
 ## 📦 Installation
 1. **Clone the repository**
