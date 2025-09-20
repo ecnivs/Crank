@@ -17,10 +17,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 from argparse import ArgumentParser
 
-load_dotenv()
-
 # -------------------------------
-# Logging preseturation
+# Logging Configuration
 # -------------------------------
 logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)s - %(message)s',
@@ -116,6 +114,8 @@ class Core:
                 self.logger.error(e)
 
 if __name__ == "__main__":
+    load_dotenv()
+
     parser = ArgumentParser()
     parser.add_argument("--path", help = "Path to config.yml", default = "preset.yml")
     args = parser.parse_args()
