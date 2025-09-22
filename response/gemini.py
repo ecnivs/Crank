@@ -3,13 +3,6 @@ import random
 import logging
 import time
 
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(levelname)s - %(message)s',
-                    force=True)
-
 class Gemini:
     def __init__(self, client, workspace):
         self.logger = logging.getLogger(self.__class__.__name__)

@@ -8,13 +8,6 @@ from pathlib import Path
 import datetime
 import logging
 
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(levelname)s - %(message)s',
-                    force=True)
-
 class Uploader:
     def __init__(self, name = "crank", auth_token = "secrets.json"):
         self.name = name.replace(" ", "").lower()

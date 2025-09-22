@@ -4,13 +4,6 @@ import os
 import random
 import logging
 
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(levelname)s - %(message)s',
-                    force=True)
-
 class TextToSpeech:
     def __init__(self, client, workspace):
         self.logger = logging.getLogger(self.__class__.__name__)

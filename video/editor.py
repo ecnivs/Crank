@@ -3,13 +3,6 @@ import subprocess
 import json
 import logging
 
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(levelname)s - %(message)s',
-                    force=True)
-
 class Editor:
     def __init__(self, workspace):
         self.logger = logging.getLogger(self.__class__.__name__)

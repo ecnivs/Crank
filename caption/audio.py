@@ -2,13 +2,6 @@ import whisper
 import logging
 import spacy
 
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(levelname)s - %(message)s',
-                    force=True)
-
 class AudioProcessor:
     def __init__(self, workspace, model_size, font):
         self.logger = logging.getLogger(self.__class__.__name__)

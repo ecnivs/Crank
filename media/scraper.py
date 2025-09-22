@@ -3,13 +3,6 @@ import subprocess
 import logging
 import yt_dlp
 
-# -------------------------------
-# Logging Configuration
-# -------------------------------
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(levelname)s - %(message)s',
-                    force=True)
-
 class Scraper:
     def __init__(self, workspace):
         self.workspace = workspace
