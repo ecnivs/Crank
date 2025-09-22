@@ -4,10 +4,9 @@ import logging
 import time
 
 class Gemini:
-    def __init__(self, client, workspace):
+    def __init__(self, client):
         self.logger = logging.getLogger(self.__class__.__name__)
         self.client = client
-        self.workspace = workspace
         self.models = {
             "2.5": "gemini-2.5-flash",
             "2.0": "gemini-2.0-flash",

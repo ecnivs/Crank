@@ -44,7 +44,7 @@ class Core:
         self.scraper = Scraper(workspace = self.workspace)
         self.video = Editor(self.workspace)
         self.tts = TextToSpeech(client = self.client, workspace = self.workspace)
-        self.gemini = Gemini(client = self.client, workspace = self.workspace)
+        self.gemini = Gemini(client = self.client)
         self.audio_processor = AudioProcessor(workspace = self.workspace,
                                               model_size = self.preset.get("WHISPER_MODEL", default = "small"),
                                               font = self.preset.get("FONT", default = "Comic Sans MS"))
