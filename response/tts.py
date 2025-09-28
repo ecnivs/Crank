@@ -85,4 +85,4 @@ class TextToSpeech:
             return path
 
         except Exception as e:
-            raise Exception(f"Failed to generate audio: {e}")
+            raise RuntimeError(f"Failed to generate audio") from e
