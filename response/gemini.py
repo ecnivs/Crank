@@ -1,7 +1,7 @@
 import logging
 import random
-import logging
 import time
+
 
 class Gemini:
     def __init__(self, client):
@@ -10,7 +10,6 @@ class Gemini:
         self.models = {
             "2.5": "gemini-2.5-flash",
             "2.0": "gemini-2.0-flash",
-            "1.5": "gemini-1.5-flash",
         }
 
     def get_response(self, query, model, max_retries=3):
@@ -28,24 +27,27 @@ class Gemini:
             for attempt in range(1, max_retries + 1):
                 try:
                     response = self.client.models.generate_content(
-                        model=fallback_model,
-                        contents=query
+                        model=fallback_model, contents=query
                     )
 
                     text = getattr(response, "text", None)
                     if not text:
                         raise ValueError(f"No text in Gemini response: {response}")
 
-                    self.logger.info(f"Gemini returned (model={fallback_model}): {text}")
+                    self.logger.info(
+                        f"Gemini returned (model={fallback_model}): {text}"
+                    )
                     return text
 
                 except Exception as e:
-                    wait = 2 ** attempt + random.uniform(0, 1)
+                    wait = 2**attempt + random.uniform(0, 1)
                     self.logger.warning(
                         f"Attempt {attempt}/{max_retries} with {fallback_model} failed: {e}. Retrying in {wait:.1f}s"
                     )
                     time.sleep(wait)
 
-            self.logger.warning(f"Model {fallback_model} exhausted retries, trying fallback if available")
+            self.logger.warning(
+                f"Model {fallback_model} exhausted retries, trying fallback if available"
+            )
 
         raise Exception("All Gemini models failed after retries and fallbacks")
